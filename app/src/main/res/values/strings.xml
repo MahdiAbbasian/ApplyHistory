@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">ApplyHistory</string>
+    <string name="company_name">Company Name</string>
+    <string name="company_website">Company Website</string>
+    <string name="description">Description</string>
+    <string name="add_company">Add company</string>
+    <string name="total_applied">Total Applications:</string>
+    <string name="apply_status">Apply Status</string>
+    <string name="update_data">update data</string>
+    <string name="edit_company">edit company</string>
+    <string name="delete_company">delete company</string>
+    <string name="search">search</string>
+
+    <string-array name="apply_status">
+        <item>Applied</item>
+        <item>Rejected</item>
+        <item>Interview</item>
+        <item>Accepted</item>
+
+    </string-array>
 </resources>
