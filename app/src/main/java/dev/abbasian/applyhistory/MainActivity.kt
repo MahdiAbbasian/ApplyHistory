@@ -1,46 +1,28 @@
 package dev.abbasian.applyhistory
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import dev.abbasian.applyhistory.ui.theme.ApplyHistoryTheme
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class MainActivity : ComponentActivity() {
+@ExperimentalCoroutinesApi
+class MainActivity : AppCompatActivity() {
+
+    @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ApplyHistoryTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = Route.Company.route) {
+                composable(route = Route.Company.route) { navBackStackEntry ->
+                    // AddOrUpdateCompanyScreen(item = Company, mode = 1, onAddOrUpdateClicked = null)
                 }
             }
+
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ApplyHistoryTheme {
-        Greeting("Android")
     }
 }
