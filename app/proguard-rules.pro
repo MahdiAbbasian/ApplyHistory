@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class **_Impl { *; }
+-keep class **_Factory { *; }
+-keep class **Dao { *; }
+-keep class androidx.room.RoomDatabase { *; }
+-keep @androidx.room.Entity class * { *; }
