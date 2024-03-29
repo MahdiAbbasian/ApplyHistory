@@ -12,6 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,8 +20,8 @@ import dev.abbasian.applyhistory.domain.model.CompanyEntity
 fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("addCompany") }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Company")
+            FloatingActionButton(onClick = { navController.navigate(Route.AddCompanyScreen.route) }) {
+                Icon(Icons.Filled.Add, contentDescription = "add_company_screen")
             }
         },
         topBar = {

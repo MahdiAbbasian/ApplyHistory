@@ -7,6 +7,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.abbasian.applyhistory.ui.company.AddCompanyScreen
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.HomeScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +24,9 @@ class MainActivity : AppCompatActivity() {
             NavHost(navController = navController, startDestination = Route.HomeScreen.route) {
                 composable(route = Route.HomeScreen.route) {
                     HomeScreen(navController, viewModel)
+                }
+                composable(route = Route.AddCompanyScreen.route) {
+                    AddCompanyScreen(navController, viewModel)
                 }
             }
         }
