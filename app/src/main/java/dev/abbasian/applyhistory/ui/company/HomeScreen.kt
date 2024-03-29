@@ -16,7 +16,7 @@ import dev.abbasian.applyhistory.domain.model.CompanyEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController, viewModel: CompanyViewModel) {
+fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate("addCompany") }) {

@@ -3,5 +3,5 @@ package dev.abbasian.applyhistory
 sealed class Route(
     val route: String,
 ){
-    object Company: Route("company")
+    object HomeScreen: Route("home_screen")
 }
