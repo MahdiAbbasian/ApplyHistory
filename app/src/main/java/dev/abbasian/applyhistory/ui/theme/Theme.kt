@@ -16,31 +16,32 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Purple700,
+    secondary = Teal700,
+    tertiary = Purple200,
+    background = Black,
+    surface = Black2A,
+    error = RejectedColor,
+    onPrimary = White,
+    onSecondary = WhiteSmoke,
+    onError = White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Purple500,
+    secondary = Teal200,
+    tertiary = Purple200,
+    background = White,
+    surface = LightGray4,
+    error = RejectedColor,
+    onPrimary = Black,
+    onSecondary = Black2A,
+    onError = Black,
 )
 
 @Composable
 fun ApplyHistoryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
