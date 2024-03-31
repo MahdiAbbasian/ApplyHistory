@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
@@ -156,6 +157,16 @@ enum class ApplyStatus(val status: Int) {
 
     companion object {
         fun fromInt(value: Int) = ApplyStatus.values().first { it.status == value }
+    }
+
+    fun toColor(): Color {
+        return when (this) {
+            NONE -> Color.Gray
+            APPLIED -> Color.Green
+            REJECTED -> Color.Red
+            INTERVIEW -> Color.Blue
+            ACCEPTED -> Color(0xFF4CAF50)
+        }
     }
 }
 
