@@ -15,20 +15,18 @@ import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(Route.AddCompanyScreen.route) }) {
-                Icon(Icons.Filled.Add, contentDescription = "add_company_screen")
+            FloatingActionButton(onClick = {
+                navController.navigate(Route.AddCompanyScreen.route)
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = "add_edit_company_screen")
             }
         },
-        topBar = {
-            TopAppBar(title = { Text("ApplyHistory") })
-        }
     ) { innerPadding ->
-        // Apply the innerPadding to the Column
+
         Column(modifier = Modifier.padding(innerPadding).padding(8.dp)) {
             val searchQuery by viewModel.searchQuery.observeAsState("")
             val filteredCompanyList by viewModel.filteredCompaniesList.observeAsState(emptyList())
@@ -44,10 +42,9 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredCompanyList) { company ->
-                    // Ensure there's only one implementation of CompanyItem or it's correctly renamed
                     CompanyItems(company = company, onClick = {
-                        // This is a click listener for each company item
-                        navController.navigate("companyDetail/${company.id}")
+                        val route = Route.CompanyDetailScreen.createRoute(company.id)
+                        navController.navigate(route)
                     })
                 }
             }
@@ -55,7 +52,6 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     }
 }
 
-// Ensure this is the only CompanyItem composable across your project, or rename if necessary
 @Composable
 fun CompanyItems(company: CompanyEntity, onClick: () -> Unit) {
     Card(
@@ -66,8 +62,8 @@ fun CompanyItems(company: CompanyEntity, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = company.companyName, style = MaterialTheme.typography.bodyLarge)
-            Text(text = company.companyWebSite ?: "", style = MaterialTheme.typography.bodyMedium)
-            Text(text = company.description ?: "", style = MaterialTheme.typography.bodySmall)
+            Text(text = company.companyWebSite, style = MaterialTheme.typography.bodyMedium)
+            Text(text = company.description, style = MaterialTheme.typography.bodySmall)
             Text(text = company.applyStatus.toString(), style = MaterialTheme.typography.bodySmall)
         }
     }
