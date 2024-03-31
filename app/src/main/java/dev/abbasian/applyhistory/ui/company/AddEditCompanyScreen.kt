@@ -25,15 +25,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import java.time.LocalDate
 
 @Composable
-fun AddCompanyScreen(navController: NavController, viewModel: CompanyViewModel) {
-    var companyName by rememberSaveable { mutableStateOf("") }
-    var companyWebsite by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    var applyStatus by rememberSaveable { mutableStateOf(ApplyStatus.NONE) }
+fun AddEditCompanyScreen(
+    navController: NavController,
+    viewModel: CompanyViewModel,
+    company: CompanyEntity? = null
+) {
+    var companyName by rememberSaveable { mutableStateOf(company?.companyName ?: "") }
+    var companyWebsite by rememberSaveable { mutableStateOf(company?.companyWebSite ?: "") }
+    var description by rememberSaveable { mutableStateOf(company?.description ?: "") }
+    var applyStatus by rememberSaveable { mutableStateOf(company?.applyStatus?.let { ApplyStatus.fromInt(it) } ?: ApplyStatus.NONE) }
+
+    val isEditMode = company != null
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -72,17 +79,28 @@ fun AddCompanyScreen(navController: NavController, viewModel: CompanyViewModel) 
 
             Button(
                 onClick = {
-                    viewModel.addCompany(
-                        CompanyEntity(
-                            id = 0,
-                            companyName = companyName,
-                            companyWebSite = companyWebsite,
-                            description = description,
-                            lastUpdateDate = LocalDate.now().toString(),
-                            applyStatus = applyStatus.ordinal
+                    if (isEditMode) {
+                        viewModel.updateCompany(
+                            company!!.id, // !! is safe here because isEditMode is true
+                            description,
+                            companyName,
+                            companyWebsite,
+                            LocalDate.now().toString(),
+                            applyStatus.status
                         )
-                    )
-                    navController.popBackStack()
+                    } else {
+                        viewModel.addCompany(
+                            CompanyEntity(
+                                id = 0,
+                                companyName = companyName,
+                                companyWebSite = companyWebsite,
+                                description = description,
+                                lastUpdateDate = LocalDate.now().toString(),
+                                applyStatus = applyStatus.status
+                            )
+                        )
+                    }
+                    navController.navigate(Route.HomeScreen.route)
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -90,7 +108,7 @@ fun AddCompanyScreen(navController: NavController, viewModel: CompanyViewModel) 
                     .height(80.dp)
                     .padding(16.dp)
             ) {
-                Text("Add Company")
+                Text(if (isEditMode) "Update Data" else "Add Company")
             }
         }
     }
