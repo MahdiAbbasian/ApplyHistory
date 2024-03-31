@@ -77,7 +77,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     Button(
                         onClick = {
                             viewModel.deleteCompany(comp.id)
-                            navController.popBackStack()
+                            navController.navigate(Route.HomeScreen.route)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
