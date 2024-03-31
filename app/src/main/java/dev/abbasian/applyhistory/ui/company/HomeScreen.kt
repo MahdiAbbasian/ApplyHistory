@@ -1,5 +1,7 @@
 package dev.abbasian.applyhistory.ui.company
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
@@ -21,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,16 +34,22 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
+
+    val context: Context = LocalContext.current
+    //val scaffoldState = rememberScaffoldState()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -63,6 +74,31 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text("Total Applications: ${filteredCompanyList.size}", style = MaterialTheme.typography.bodyLarge)
+
+            Button(
+                onClick = {
+                    viewModel.exportDataToFile(context) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("Export to File")
+            }
+
+            Button(onClick = {
+                viewModel.importDataFromFile(context) {success->
+                    if (success) {
+                        Toast.makeText(context, "Success Import", Toast.LENGTH_SHORT).show()
+                    }
+                } }, modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
+                Text("Import from File")
+            }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredCompanyList) { company ->
