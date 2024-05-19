@@ -78,12 +78,8 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
             Button(
                 onClick = {
-                    viewModel.exportDataToFile(context) { success ->
-                        if (success) {
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        }
+                    viewModel.exportDataToFile(context) { success, message ->
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }, modifier = Modifier
                     .fillMaxWidth()

@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -60,21 +61,29 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         return String(decryptedBytes)
     }
 
-    fun exportDataToFile(context: Context, onCompletion: (Boolean) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun exportDataToFile(context: Context, onCompletion: (Boolean, String) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         try {
             val companies = repository.getCompanies().first()
+            if (companies.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    onCompletion(false, "No data to export")
+                }
+                return@launch
+            }
             val jsonData = Gson().toJson(companies)
             val encryptedData = encrypt(jsonData)
+
+            val fileName = "exported_companies.txt"
+            val file = File(context.getExternalFilesDir(null), fileName)
+            file.writeText(encryptedData)
+
             withContext(Dispatchers.Main) {
-                context.openFileOutput("exported_companies.txt", Context.MODE_PRIVATE).use {
-                    it.write(encryptedData.toByteArray())
-                }
-                onCompletion(true)
+                onCompletion(true, "File saved successfully at: ${file.absolutePath}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
             withContext(Dispatchers.Main) {
-                onCompletion(false)
+                onCompletion(false, "Error exporting data")
             }
         }
     }
