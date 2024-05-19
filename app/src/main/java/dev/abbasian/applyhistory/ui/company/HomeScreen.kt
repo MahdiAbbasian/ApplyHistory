@@ -1,7 +1,11 @@
 package dev.abbasian.applyhistory.ui.company
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,8 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,14 +35,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.Date
 import java.util.Locale
 
@@ -49,6 +49,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
     val context: Context = LocalContext.current
     //val scaffoldState = rememberScaffoldState()
+    val filePickerLauncher = filePickerLauncher(viewModel)
 
     Scaffold(
         floatingActionButton = {
@@ -80,24 +81,25 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     viewModel.exportDataToFile(context) { success ->
                         if (success) {
                             Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text("Export to File")
+                Text("Export to file")
             }
 
-            Button(onClick = {
-                viewModel.importDataFromFile(context) {success->
-                    if (success) {
-                        Toast.makeText(context, "Success Import", Toast.LENGTH_SHORT).show()
-                    }
-                } }, modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
-                Text("Import from File")
+            Button(
+                onClick = {
+                    filePickerLauncher.launch("text/plain")
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("Import from file")
             }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -161,4 +163,26 @@ fun ApplyStatusChip(applyStatus: ApplyStatus) {
             style = MaterialTheme.typography.bodySmall
         )
     }
+}
+
+@Composable
+fun filePickerLauncher(viewModel: CompanyViewModel): ManagedActivityResultLauncher<String, Uri?> {
+    val context = LocalContext.current
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            if (uri != null) {
+                viewModel.importDataFromFile(context, uri) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Import Success", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Import Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    )
+
+    return filePickerLauncher
 }

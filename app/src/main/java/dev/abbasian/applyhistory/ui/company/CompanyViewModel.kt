@@ -5,6 +5,10 @@ import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import dev.abbasian.applyhistory.domain.repo.CompanyRepository
 import kotlinx.coroutines.launch
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -12,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -73,20 +79,27 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         }
     }
 
-    fun importDataFromFile(context: Context, onCompletion: (Boolean) -> Unit) =
+    fun importDataFromFile(context: Context, uri: Uri, onCompletion: (Boolean) -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val encryptedData = withContext(Dispatchers.Main) {
-                    context.openFileInput("exported_companies.txt").bufferedReader()
-                        .use { it.readText() }
-                }
-                val decryptedData = decrypt(encryptedData)
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val data = reader.readLines().joinToString("\n")
+                reader.close()
+                inputStream?.close()
+
+                val decryptedData = decrypt(data)
+
                 val type = object : TypeToken<List<CompanyEntity>>() {}.type
                 val importedCompanies: List<CompanyEntity> = Gson().fromJson(decryptedData, type)
+
                 importedCompanies.forEach { company ->
                     repository.addCompany(company)
                 }
-                onCompletion(true)
+
+                withContext(Dispatchers.Main) {
+                    onCompletion(true)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
