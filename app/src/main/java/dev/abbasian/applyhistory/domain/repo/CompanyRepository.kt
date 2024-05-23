@@ -1,7 +1,7 @@
 package dev.abbasian.applyhistory.domain.repo
 
 import androidx.lifecycle.asFlow
-import dev.abbasian.applyhistory.db.local.database.AppDatabase
+import dev.abbasian.applyhistory.data.local.database.AppDatabase
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

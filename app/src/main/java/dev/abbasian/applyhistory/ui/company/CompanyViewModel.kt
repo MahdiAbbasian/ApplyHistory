@@ -29,14 +29,16 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
     companion object {
         private const val AES_MODE = "AES/CBC/PKCS5PADDING"
         private const val CHARSET_NAME = "UTF-8"
-        private const val SECRET_KEY = "your-secret-key-" // Ensure this is 16, 24, or 32 bytes for AES
+        private const val SECRET_KEY =
+            "your-secret-key-" // Ensure this is 16, 24, or 32 bytes for AES
         private const val IV_STRING = "1234567890123456" // Corrected to exactly 16 bytes
     }
 
-    val companiesCount: LiveData<Int> = repository.getCompaniesCount().asLiveData()
     val companiesList: LiveData<List<CompanyEntity>> = repository.getCompanies().asLiveData()
+
     private val _company = MutableLiveData<CompanyEntity?>()
     val company: LiveData<CompanyEntity?> = _company
+
     private val _searchQuery = MutableLiveData<String>("")
     val searchQuery: LiveData<String> = _searchQuery
 
@@ -49,6 +51,7 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         val cipher = Cipher.getInstance(AES_MODE)
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv)
         val encrypted = cipher.doFinal(value.toByteArray())
+
         return Base64.getEncoder().encodeToString(encrypted)
     }
 
@@ -58,35 +61,37 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         val cipher = Cipher.getInstance(AES_MODE)
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv)
         val decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(value))
+
         return String(decryptedBytes)
     }
 
-    fun exportDataToFile(context: Context, onCompletion: (Boolean, String) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            val companies = repository.getCompanies().first()
-            if (companies.isEmpty()) {
-                withContext(Dispatchers.Main) {
-                    onCompletion(false, "No data to export")
+    fun exportDataToFile(context: Context, onCompletion: (Boolean, String) -> Unit) =
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val companies = repository.getCompanies().first()
+                if (companies.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        onCompletion(false, "No data to export")
+                    }
+                    return@launch
                 }
-                return@launch
-            }
-            val jsonData = Gson().toJson(companies)
-            val encryptedData = encrypt(jsonData)
+                val jsonData = Gson().toJson(companies)
+                val encryptedData = encrypt(jsonData)
 
-            val fileName = "exported_companies.txt"
-            val file = File(context.getExternalFilesDir(null), fileName)
-            file.writeText(encryptedData)
+                val fileName = "exported_companies.txt"
+                val file = File(context.getExternalFilesDir(null), fileName)
+                file.writeText(encryptedData)
 
-            withContext(Dispatchers.Main) {
-                onCompletion(true, "File saved successfully at: ${file.absolutePath}")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            withContext(Dispatchers.Main) {
-                onCompletion(false, "Error exporting data")
+                withContext(Dispatchers.Main) {
+                    onCompletion(true, "File saved successfully at: ${file.absolutePath}")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onCompletion(false, "Error exporting data")
+                }
             }
         }
-    }
 
     fun importDataFromFile(context: Context, uri: Uri, onCompletion: (Boolean) -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -140,8 +145,22 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         repository.addCompany(company)
     }
 
-    fun updateCompany(id: Int, description: String?, companyName: String?, companyWeb: String?, lastUpdateDate: String?, applyStatus: Int?) = viewModelScope.launch {
-        repository.updateCompany(id, description, companyName, companyWeb, lastUpdateDate, applyStatus)
+    fun updateCompany(
+        id: Int,
+        description: String?,
+        companyName: String?,
+        companyWeb: String?,
+        lastUpdateDate: String?,
+        applyStatus: Int?
+    ) = viewModelScope.launch {
+        repository.updateCompany(
+            id,
+            description,
+            companyName,
+            companyWeb,
+            lastUpdateDate,
+            applyStatus
+        )
     }
 
     fun deleteCompany(id: Int) = viewModelScope.launch {
