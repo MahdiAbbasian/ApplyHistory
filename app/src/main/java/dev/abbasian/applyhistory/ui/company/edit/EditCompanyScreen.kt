@@ -1,4 +1,4 @@
-package dev.abbasian.applyhistory.ui.company
+package dev.abbasian.applyhistory.ui.company.edit
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,7 +14,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
+import dev.abbasian.applyhistory.ui.company.CompanyViewModel
+import dev.abbasian.applyhistory.ui.component.CustomTextField
 import java.time.LocalDate
 
 @Composable
-fun AddEditCompanyScreen(
+fun EditCompanyScreen(
     navController: NavController,
     viewModel: CompanyViewModel,
     company: CompanyEntity? = null
@@ -39,7 +40,9 @@ fun AddEditCompanyScreen(
     var companyName by rememberSaveable { mutableStateOf(company?.companyName ?: "") }
     var companyWebsite by rememberSaveable { mutableStateOf(company?.companyWebSite ?: "") }
     var description by rememberSaveable { mutableStateOf(company?.description ?: "") }
-    var applyStatus by rememberSaveable { mutableStateOf(company?.applyStatus?.let { ApplyStatus.fromInt(it) } ?: ApplyStatus.NONE) }
+    var applyStatus by rememberSaveable { mutableStateOf(company?.applyStatus?.let {
+        ApplyStatus.fromInt(it) } ?: ApplyStatus.NONE)
+    }
 
     val isEditMode = company != null
 
@@ -50,24 +53,24 @@ fun AddEditCompanyScreen(
                 .fillMaxWidth()
                 .align(Alignment.TopStart)
             ) {
-                TextField(
-                    value = companyName,
+                CustomTextField(
+                    placeholder = "Company Name",
+                    text = companyName,
                     onValueChange = { companyName = it },
-                    label = { Text("Company Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = companyWebsite,
+                CustomTextField(
+                    placeholder = "Company Website",
+                    text = companyWebsite,
                     onValueChange = { companyWebsite = it },
-                    label = { Text("Company Website") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = description,
+                CustomTextField(
+                    placeholder = "Description",
+                    text = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 100.dp)

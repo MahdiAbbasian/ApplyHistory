@@ -1,71 +1,77 @@
 package dev.abbasian.applyhistory.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
+enum class AppTheme {
+    Light, Dark, Default
+}
+
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple700,
-    secondary = Teal700,
-    tertiary = Purple200,
+    primary = Purple200,
+    secondary = Purple700,
     background = Black,
-    surface = Black2A,
-    error = RejectedColor,
+    error = red,
+    surface = Black,
     onPrimary = White,
-    onSecondary = WhiteSmoke,
+    onSecondary = White,
+    onBackground = White,
     onError = White,
+    onSurface = White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple500,
-    secondary = Teal200,
-    tertiary = Purple200,
+    primary = Purple200,
+    secondary = Purple700,
     background = White,
-    surface = LightGray4,
-    error = RejectedColor,
-    onPrimary = Black,
-    onSecondary = Black2A,
-    onError = Black,
+    error = red,
+    surface = White,
+    onPrimary = White,
+    onSecondary = White,
+    onBackground = Black,
+    onError = White,
+    onSurface = Black
 )
 
 @Composable
 fun ApplyHistoryTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    appTheme: AppTheme = AppTheme.Light,
+    isDarkMode: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = when (appTheme) {
+        AppTheme.Default -> {
+            if (isDarkMode) {
+                DarkColorScheme
+            } else {
+                LightColorScheme
+            }
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+        AppTheme.Light -> {
+            LightColorScheme
+        }
+
+        AppTheme.Dark -> {
+            DarkColorScheme
         }
     }
 
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = colorScheme.primary,
+            darkIcons = false,
+        )
+    }
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = colorScheme, typography = Typography, content = content
     )
 }

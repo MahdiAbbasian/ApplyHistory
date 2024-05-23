@@ -1,4 +1,4 @@
-package dev.abbasian.applyhistory
+package dev.abbasian.applyhistory.ui.main
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -12,10 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.abbasian.applyhistory.ui.company.AddEditCompanyScreen
-import dev.abbasian.applyhistory.ui.company.CompanyDetailScreen
+import dev.abbasian.applyhistory.Route
+import dev.abbasian.applyhistory.ui.company.edit.EditCompanyScreen
+import dev.abbasian.applyhistory.ui.company.detail.CompanyDetailScreen
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
-import dev.abbasian.applyhistory.ui.company.HomeScreen
+import dev.abbasian.applyhistory.ui.home.HomeScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     HomeScreen(navController, viewModel)
                 }
                 composable(route = Route.AddCompanyScreen.route) {
-                    AddEditCompanyScreen(navController, viewModel, null)
+                    EditCompanyScreen(navController, viewModel, null)
                 }
                 composable(
                     route = Route.EditCompanyScreen.route,
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
                     val company by viewModel.company.observeAsState()
 
-                    AddEditCompanyScreen(navController, viewModel, company)
+                    EditCompanyScreen(navController, viewModel, company)
                 }
                 composable(
                     route = Route.CompanyDetailScreen.route,

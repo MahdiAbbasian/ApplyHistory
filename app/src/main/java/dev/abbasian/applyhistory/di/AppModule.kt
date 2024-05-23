@@ -1,7 +1,7 @@
-package dev.abbasian.applyhistory.domain.di
+package dev.abbasian.applyhistory.di
 
 import androidx.room.Room
-import dev.abbasian.applyhistory.db.local.database.AppDatabase
+import dev.abbasian.applyhistory.data.local.database.AppDatabase
 import dev.abbasian.applyhistory.domain.repo.CompanyRepository
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import org.koin.android.ext.koin.androidContext

@@ -1,4 +1,4 @@
-package dev.abbasian.applyhistory.ui.company
+package dev.abbasian.applyhistory.ui.company.detail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
+import dev.abbasian.applyhistory.ui.company.CompanyViewModel
+import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 
 @Composable
 fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewModel, companyId: Int) {

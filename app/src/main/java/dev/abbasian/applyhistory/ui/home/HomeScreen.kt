@@ -1,4 +1,4 @@
-package dev.abbasian.applyhistory.ui.company
+package dev.abbasian.applyhistory.ui.home
 
 import android.content.Context
 import android.net.Uri
@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
+import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
+import dev.abbasian.applyhistory.ui.company.CompanyViewModel
+import dev.abbasian.applyhistory.ui.company.edit.toApplyStatusString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

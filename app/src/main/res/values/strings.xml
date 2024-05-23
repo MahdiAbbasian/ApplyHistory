@@ -18,4 +18,8 @@
         <item>Accepted</item>
 
     </string-array>
+
+    <string name="strTheUrlMustStartWithHttpOrHttps">The URL must start with "http://" or "https://".</string>
+    <string name="strTheUrlIsNotValid">The URL is not valid.</string>
+
 </resources>

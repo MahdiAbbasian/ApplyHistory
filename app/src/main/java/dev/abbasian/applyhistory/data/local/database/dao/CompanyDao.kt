@@ -1,4 +1,4 @@
-package dev.abbasian.applyhistory.db.local.database
+package dev.abbasian.applyhistory.data.local.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
