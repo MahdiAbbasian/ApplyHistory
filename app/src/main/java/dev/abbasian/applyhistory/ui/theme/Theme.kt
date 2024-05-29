@@ -1,12 +1,24 @@
 package dev.abbasian.applyhistory.ui.theme
 
+import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dev.abbasian.applyhistory.ui.component.GlassEffectBackground
 
 enum class AppTheme {
     Light, Dark, Default
@@ -46,8 +58,13 @@ fun ApplyHistoryTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when (appTheme) {
-        AppTheme.Default -> {
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        appTheme == AppTheme.Default -> {
             if (isDarkMode) {
                 DarkColorScheme
             } else {
@@ -55,23 +72,35 @@ fun ApplyHistoryTheme(
             }
         }
 
-        AppTheme.Light -> {
+        appTheme == AppTheme.Light -> {
             LightColorScheme
         }
 
-        AppTheme.Dark -> {
+        appTheme == AppTheme.Dark -> {
             DarkColorScheme
+        }
+
+        else -> {
+            if (isDarkMode) DarkColorScheme else LightColorScheme
         }
     }
 
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = colorScheme.primary,
-            darkIcons = false,
-        )
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
+        }
     }
+
     MaterialTheme(
-        colorScheme = colorScheme, typography = Typography, content = content
-    )
+        colorScheme = colorScheme,
+        typography = Typography,
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GlassEffectBackground()
+            content()
+        }
+    }
 }
