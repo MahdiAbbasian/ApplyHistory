@@ -7,6 +7,7 @@ import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,6 +26,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
@@ -35,25 +38,39 @@ import dev.abbasian.applyhistory.R
 fun GlassEffectBackground() {
     Box(modifier = Modifier) {
         // Background image
-        Image(painter = painterResource(id = R.drawable.sample), contentDescription = null)
+        Image(
+            painter = painterResource(id = R.drawable.apply_history),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
-        val source = ImageBitmap.imageResource(id = R.drawable.sample).asAndroidBitmap()
+        val source = ImageBitmap.imageResource(id = R.drawable.apply_history).asAndroidBitmap()
 
         // Blur effect, Backward compatibility
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             val blurredBitmap = legacyBlurImage(
                 source = source,
-                blurRadio = 25f,
-//        blurLayer = 5 // Todo: if more blur needed, uncomment and tweak it
+                blurRadio = 25f
             )
             BlurImage(
                 bitmap = blurredBitmap,
                 modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = 1.0f,
+                        scaleY = 1.0f
+                    )
             )
         } else {
             BlurImage(
                 bitmap = source,
                 modifier = Modifier.blur(radius = 10.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = 1.0f,
+                        scaleY = 1.0f
+                    )
             )
         }
     }
@@ -92,7 +109,7 @@ private fun BlurImage(
         bitmap = bitmap.asImageBitmap(),
         contentDescription = null,
         modifier = modifier
-            .padding(16.dp)
+            .padding(4.dp)
             .clip(CurvedBorder(cornerRadius = cornerRadius))
             .drawWithCache {
                 onDrawWithContent {
@@ -108,7 +125,8 @@ private fun BlurImage(
                     drawRect(
                         brush = Brush.radialGradient(
                             colors = listOf(Color(0x65F3F0F0), Color(0x19BBBABA)),
-                            center = Offset(100f,
+                            center = Offset(
+                                100f,
                                 size.height
                                     .div(2)
                                     .plus(100f)
@@ -186,4 +204,5 @@ fun blurPath(size: Size, cornerRadius: Float): Path {
         )
         close()
     }
+
 }
