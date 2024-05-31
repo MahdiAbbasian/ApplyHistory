@@ -7,8 +7,8 @@ import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -27,36 +27,27 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import dev.abbasian.applyhistory.R
+import dev.abbasian.applyhistory.ui.theme.SetBackground
 
 @Composable
-fun GlassEffectBackground() {
-    Box(modifier = Modifier) {
-        // Background image
-        Image(
-            painter = painterResource(id = R.drawable.apply_history),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
+fun GlassEffectBackground(content: @Composable () -> Unit) {
+    Box(modifier = Modifier.wrapContentSize()) {
+        SetBackground()
         val source = ImageBitmap.imageResource(id = R.drawable.apply_history).asAndroidBitmap()
 
-        // Blur effect, Backward compatibility
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             val blurredBitmap = legacyBlurImage(
                 source = source,
-                blurRadio = 25f
+                blurRadius = 25f
             )
             BlurImage(
                 bitmap = blurredBitmap,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .wrapContentSize()
                     .graphicsLayer(
                         scaleX = 1.0f,
                         scaleY = 1.0f
@@ -65,13 +56,18 @@ fun GlassEffectBackground() {
         } else {
             BlurImage(
                 bitmap = source,
-                modifier = Modifier.blur(radius = 10.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
-                    .fillMaxSize()
+                modifier = Modifier
+                    .blur(radius = 10.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
+                    .wrapContentSize()
                     .graphicsLayer(
                         scaleX = 1.0f,
                         scaleY = 1.0f
                     )
             )
+        }
+
+        Box(modifier = Modifier.wrapContentSize()) {
+            content()
         }
     }
 }
@@ -80,7 +76,7 @@ fun GlassEffectBackground() {
 @Composable
 private fun legacyBlurImage(
     source: Bitmap,
-    blurRadio: Float = 25f,
+    blurRadius: Float = 25f,
     blurLayer: Int = 1,
 ): Bitmap {
     val bitmap = source.copy(Bitmap.Config.ARGB_8888, true)
@@ -88,7 +84,7 @@ private fun legacyBlurImage(
     for (i in 0 until blurLayer) {
         val bitmapAlloc = Allocation.createFromBitmap(renderScript, bitmap)
         ScriptIntrinsicBlur.create(renderScript, bitmapAlloc.element).apply {
-            setRadius(blurRadio)
+            setRadius(blurRadius)
             setInput(bitmapAlloc)
             forEach(bitmapAlloc)
         }
@@ -204,5 +200,4 @@ fun blurPath(size: Size, cornerRadius: Float): Path {
         )
         close()
     }
-
 }
