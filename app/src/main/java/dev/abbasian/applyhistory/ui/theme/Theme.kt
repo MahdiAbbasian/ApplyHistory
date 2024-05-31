@@ -2,6 +2,7 @@ package dev.abbasian.applyhistory.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,24 +14,25 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import dev.abbasian.applyhistory.ui.component.GlassEffectBackground
+import dev.abbasian.applyhistory.R
 
 enum class AppTheme {
     Light, Dark, Default
 }
 
-
 private val DarkColorScheme = darkColorScheme(
     primary = Purple200,
     secondary = Purple700,
-    background = Black,
-    error = red,
-    surface = Black,
+    background = Color.Transparent,
+    error = RejectedColor,
+    surface = Color.Transparent,
     onPrimary = White,
     onSecondary = White,
     onBackground = White,
@@ -41,11 +43,11 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = Purple200,
     secondary = Purple700,
-    background = White,
-    error = red,
-    surface = White,
-    onPrimary = White,
-    onSecondary = White,
+    background = Color.Transparent,
+    error = RejectedColor,
+    surface = Color.Transparent,
+    onPrimary = Black,
+    onSecondary = Black,
     onBackground = Black,
     onError = White,
     onSurface = Black
@@ -65,24 +67,12 @@ fun ApplyHistoryTheme(
         }
 
         appTheme == AppTheme.Default -> {
-            if (isDarkMode) {
-                DarkColorScheme
-            } else {
-                LightColorScheme
-            }
-        }
-
-        appTheme == AppTheme.Light -> {
-            LightColorScheme
-        }
-
-        appTheme == AppTheme.Dark -> {
-            DarkColorScheme
-        }
-
-        else -> {
             if (isDarkMode) DarkColorScheme else LightColorScheme
         }
+
+        appTheme == AppTheme.Light -> LightColorScheme
+        appTheme == AppTheme.Dark -> DarkColorScheme
+        else -> if (isDarkMode) DarkColorScheme else LightColorScheme
     }
 
     val view = LocalView.current
@@ -90,7 +80,8 @@ fun ApplyHistoryTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                !isDarkMode
         }
     }
 
@@ -99,8 +90,18 @@ fun ApplyHistoryTheme(
         typography = Typography,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            GlassEffectBackground()
+            SetBackground()
             content()
         }
     }
+}
+
+@Composable
+fun SetBackground() {
+    return Image(
+        painter = painterResource(id = R.drawable.apply_history),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
 }
