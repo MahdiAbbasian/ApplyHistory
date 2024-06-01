@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.edit.toApplyStatusString
+import dev.abbasian.applyhistory.ui.component.CustomTextField
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,7 +53,6 @@ import java.util.Locale
 fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
     val context: Context = LocalContext.current
-    //val scaffoldState = rememberScaffoldState()
     val filePickerLauncher = filePickerLauncher(viewModel)
 
     Scaffold(
@@ -64,20 +65,53 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
         },
     ) { innerPadding ->
 
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
             val searchQuery by viewModel.searchQuery.observeAsState("")
             val filteredCompanyList by viewModel.filteredCompaniesList.observeAsState(emptyList())
 
-            OutlinedTextField(
-                value = searchQuery,
+            CustomTextField(
+                text = searchQuery,
                 onValueChange = { viewModel.updateSearchQuery(it) },
-                label = { Text("Search") },
+                placeholder = "Search",
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Total Applications: ${filteredCompanyList.size}", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.padding(8.dp),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Total Applications",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${filteredCompanyList.size}",
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
@@ -86,17 +120,19 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     }
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(4.dp)
             ) {
                 Text("Export to file")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
                     filePickerLauncher.launch("text/plain")
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(4.dp)
             ) {
                 Text("Import from file")
             }
