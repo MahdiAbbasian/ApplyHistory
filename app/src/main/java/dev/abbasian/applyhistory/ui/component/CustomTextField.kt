@@ -33,6 +33,7 @@ fun CustomTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     singleLine: Boolean = false,
     maxLine: Int = 1,
+    readOnly: Boolean = false
 ) {
     val context = LocalContext.current
     val colorBorder = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
@@ -43,9 +44,11 @@ fun CustomTextField(
                 if (isNumber(text)) text else ""
             } else text,
             onValueChange = {
-                if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
-                    if (isNumber(it)) onValueChange(it)
-                } else onValueChange(it)
+                if (!readOnly) {
+                    if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
+                        if (isNumber(it)) onValueChange(it)
+                    } else onValueChange(it)
+                }
             },
             label = { Text(text = placeholder) },
             leadingIcon = leadingIcon,
@@ -53,6 +56,8 @@ fun CustomTextField(
             singleLine = singleLine,
             maxLines = maxLine,
             isError = isError,
+            readOnly = readOnly,
+            enabled = !readOnly,
             visualTransformation = if (keyboardType == KeyboardType.Password) {
                 if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
             } else {
