@@ -1,34 +1,23 @@
 package dev.abbasian.applyhistory.ui.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import dev.abbasian.applyhistory.core.extension.UiText
 import dev.abbasian.applyhistory.core.extension.isNumber
-import dev.abbasian.applyhistory.ui.theme.silver
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(
     placeholder: String,
@@ -36,7 +25,7 @@ fun CustomTextField(
     onValueChange: (String) -> Unit = {},
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Done,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     errorMessage: UiText? = null,
     isError: Boolean = false,
     isVisible: Boolean = false,
@@ -45,33 +34,26 @@ fun CustomTextField(
     singleLine: Boolean = false,
     maxLine: Int = 1,
 ) {
-    val isKeyboardTypeNumber =
-        keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val focusRequester = remember {
-        FocusRequester()
-    }
-    val colorBorder = if (isError) MaterialTheme.colorScheme.error else if (isFocused)
-        MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+    val colorBorder = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
 
     Column {
-        BasicTextField(
-            value = if (isKeyboardTypeNumber) {
+        OutlinedTextField(
+            value = if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
                 if (isNumber(text)) text else ""
             } else text,
             onValueChange = {
-                if (isKeyboardTypeNumber) {
+                if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
                     if (isNumber(it)) onValueChange(it)
                 } else onValueChange(it)
             },
-            textStyle = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface),
-            maxLines = maxLine,
+            label = { Text(text = placeholder) },
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
             singleLine = singleLine,
-            interactionSource = interactionSource,
-            visualTransformation =
-            if (keyboardType == KeyboardType.Password) {
+            maxLines = maxLine,
+            isError = isError,
+            visualTransformation = if (keyboardType == KeyboardType.Password) {
                 if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
             } else {
                 VisualTransformation.None
@@ -80,56 +62,21 @@ fun CustomTextField(
                 keyboardType = keyboardType,
                 imeAction = imeAction
             ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            decorationBox = { innerTextField ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                        .border(
-                            width = 1.dp,
-                            shape = RoundedCornerShape(8.dp),
-                            color = colorBorder
-                        )
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .focusRequester(focusRequester)
-                ) {
-                    if (leadingIcon != null) {
-                        leadingIcon()
-                    } else {
-                        Spacer(modifier = Modifier.padding(8.dp))
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(1.0f)
-                            .padding(vertical = 16.dp)
-                    ) {
-                        if (text.isEmpty()) {
-                            Text(
-                                text = placeholder,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = silver,
-                            )
-                        }
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            innerTextField()
-                        }
-                    }
-                    if (trailingIcon != null) {
-                        trailingIcon()
-                    } else {
-                        Spacer(modifier = Modifier.padding(8.dp))
-                    }
-                }
-            },
-        )
-        Text(
-            text = if (isError) errorMessage!!.asString(context) else "",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall,
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = colorBorder,
+                errorBorderColor = MaterialTheme.colorScheme.error
+            ),
             modifier = modifier
         )
+        if (isError && errorMessage != null) {
+            Text(
+                text = errorMessage.asString(context),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = modifier
+            )
+        }
     }
 }
