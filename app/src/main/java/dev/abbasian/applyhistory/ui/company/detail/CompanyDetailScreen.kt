@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
+import dev.abbasian.applyhistory.ui.component.CustomTextField
 
 @Composable
 fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewModel, companyId: Int) {
@@ -42,36 +43,36 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     .padding(16.dp)
                     .fillMaxWidth()
                 ) {
-                    TextField(
-                        value = comp.companyName,
+                    CustomTextField(
+                        text = comp.companyName,
                         onValueChange = {},
-                        label = { Text("Company Name") },
+                        placeholder = "Company Name",
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = comp.companyWebSite ?: "",
+                    CustomTextField(
+                        text = comp.companyWebSite ?: "",
                         onValueChange = {},
-                        label = { Text("Company Website") },
+                        placeholder = "Company Website",
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = comp.description ?: "",
+                    CustomTextField(
+                        text = comp.description ?: "",
                         onValueChange = {},
-                        label = { Text("Description") },
+                        placeholder = "Description",
                         readOnly = true,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(150.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = comp.applyStatus?.let { ApplyStatus.fromInt(it).name } ?: "",
+                    CustomTextField(
+                        text = comp.applyStatus?.let { ApplyStatus.fromInt(it).name } ?: "",
                         onValueChange = {},
-                        label = { Text("Apply Status") },
+                        placeholder = "Apply Status",
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
