@@ -40,18 +40,21 @@ fun EditCompanyScreen(
     var companyName by rememberSaveable { mutableStateOf(company?.companyName ?: "") }
     var companyWebsite by rememberSaveable { mutableStateOf(company?.companyWebSite ?: "") }
     var description by rememberSaveable { mutableStateOf(company?.description ?: "") }
-    var applyStatus by rememberSaveable { mutableStateOf(company?.applyStatus?.let {
-        ApplyStatus.fromInt(it) } ?: ApplyStatus.NONE)
+    var applyStatus by rememberSaveable {
+        mutableStateOf(company?.applyStatus?.let {
+            ApplyStatus.fromInt(it)
+        } ?: ApplyStatus.NONE)
     }
 
     val isEditMode = company != null
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .align(Alignment.TopStart)
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart)
             ) {
                 CustomTextField(
                     placeholder = "Company Name",
@@ -122,9 +125,11 @@ fun EditCompanyScreen(
 fun DropdownField(selectedStatus: ApplyStatus, onStatusSelected: (ApplyStatus) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val applyStatusOptions = ApplyStatus.values()
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
         Text(
             text = selectedStatus.toApplyStatusString(),
             modifier = Modifier
@@ -167,7 +172,7 @@ enum class ApplyStatus(val status: Int) {
             NONE -> Color.Gray
             APPLIED -> Color.Green
             REJECTED -> Color.Red
-            INTERVIEW -> Color.Blue
+            INTERVIEW -> Color.Yellow
             ACCEPTED -> Color(0xFF4CAF50)
         }
     }
