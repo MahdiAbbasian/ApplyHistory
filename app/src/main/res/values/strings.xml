@@ -21,5 +21,6 @@
 
     <string name="strTheUrlMustStartWithHttpOrHttps">The URL must start with "http://" or "https://".</string>
     <string name="strTheUrlIsNotValid">The URL is not valid.</string>
+    <string name="strEmptyField">This field can not be empty.</string>
 
 </resources>
