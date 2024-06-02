@@ -27,7 +27,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,10 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
-import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
+import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.company.edit.toApplyStatusString
 import dev.abbasian.applyhistory.ui.component.CustomTextField
+import dev.abbasian.applyhistory.ui.theme.AppString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -77,7 +77,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
             CustomTextField(
                 text = searchQuery,
                 onValueChange = { viewModel.updateSearchQuery(it) },
-                placeholder = "Search",
+                placeholder = AppString.SEARCH,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -98,7 +98,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Total Applications",
+                        text = AppString.TOTAL_APPLICATIONS,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -122,7 +122,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                Text("Export to file")
+                Text(AppString.EXPORT_TO_FILE)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -134,7 +134,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                Text("Import from file")
+                Text(AppString.IMPORT_FROM_FILE)
             }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -216,9 +216,9 @@ fun filePickerLauncher(viewModel: CompanyViewModel): ManagedActivityResultLaunch
             if (uri != null) {
                 viewModel.importDataFromFile(context, uri) { success ->
                     if (success) {
-                        Toast.makeText(context, "Import Success", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, AppString.IMPORT_FILE_SUCCESS, Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "Import Failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, AppString.IMPORT_FILE_FAILED, Toast.LENGTH_SHORT).show()
                     }
                 }
             }

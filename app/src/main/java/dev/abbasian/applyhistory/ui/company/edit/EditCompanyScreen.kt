@@ -1,5 +1,6 @@
 package dev.abbasian.applyhistory.ui.company.edit
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,10 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import dev.abbasian.applyhistory.R
 import dev.abbasian.applyhistory.Route
+import dev.abbasian.applyhistory.business.usecase.company.companyWebSiteValidatorUseCase
+import dev.abbasian.applyhistory.business.usecase.company.emptyFieldValidatorUseCase
+import dev.abbasian.applyhistory.core.extension.UiText
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.component.CustomTextField
+import dev.abbasian.applyhistory.ui.theme.AppString
+import dev.abbasian.applyhistory.ui.theme.AppString.statusOptions
 import java.time.LocalDate
 
 @Composable
@@ -46,6 +54,12 @@ fun EditCompanyScreen(
         } ?: ApplyStatus.NONE)
     }
 
+    var isCompanyWebsiteValid by remember { mutableStateOf(true) }
+    var companyWebsiteError by remember { mutableStateOf<UiText?>(null) }
+
+    var isCompanyNameValid by remember { mutableStateOf(true) }
+    var companyNameError by remember { mutableStateOf<UiText?>(null) }
+
     val isEditMode = company != null
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -57,21 +71,47 @@ fun EditCompanyScreen(
                     .align(Alignment.TopStart)
             ) {
                 CustomTextField(
-                    placeholder = "Company Name",
+                    placeholder = AppString.COMPANY_NAME,
                     text = companyName,
-                    onValueChange = { companyName = it },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = {
+                        companyName = it
+                        val result = emptyFieldValidatorUseCase(it)
+                        isCompanyNameValid = result.success
+                        companyNameError = if (result.success) null else result.failure
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = !isCompanyNameValid
                 )
+                if (!isCompanyNameValid) {
+                    Text(
+                        text = companyNameError?.asString() ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 CustomTextField(
-                    placeholder = "Company Website",
+                    placeholder = AppString.COMPANY_WEBSITE,
                     text = companyWebsite,
-                    onValueChange = { companyWebsite = it },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = {
+                        companyWebsite = it
+                        val result = companyWebSiteValidatorUseCase(it)
+                        isCompanyWebsiteValid = result.success
+                        companyWebsiteError = if (result.success) null else result.failure
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = !isCompanyWebsiteValid
                 )
+                if (!isCompanyWebsiteValid) {
+                    Text(
+                        text = companyWebsiteError?.asString() ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 CustomTextField(
-                    placeholder = "Description",
+                    placeholder = AppString.DESCRIPTION,
                     text = description,
                     onValueChange = { description = it },
                     modifier = Modifier
@@ -79,56 +119,77 @@ fun EditCompanyScreen(
                         .heightIn(min = 100.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                DropdownField(applyStatus) { status ->
-                    applyStatus = status
-                }
+                DropdownField(
+                    selectedStatus = applyStatus,
+                    onStatusSelected = { status ->
+                        applyStatus = status
+                    },
+                    isError = false
+                )
             }
 
             Button(
                 onClick = {
-                    if (isEditMode) {
-                        viewModel.updateCompany(
-                            company!!.id, // !! is safe here because isEditMode is true
-                            description,
-                            companyName,
-                            companyWebsite,
-                            LocalDate.now().toString(),
-                            applyStatus.status
-                        )
-                    } else {
-                        viewModel.addCompany(
-                            CompanyEntity(
-                                id = 0,
-                                companyName = companyName,
-                                companyWebSite = companyWebsite,
-                                description = description,
-                                lastUpdateDate = LocalDate.now().toString(),
-                                applyStatus = applyStatus.status
+                    var isValid = true
+
+                    val companyNameResult = emptyFieldValidatorUseCase(companyName)
+                    isCompanyNameValid = companyNameResult.success
+                    companyNameError = if (companyNameResult.success) null else companyNameResult.failure
+                    if (!companyNameResult.success) isValid = false
+
+                    val companyWebsiteResult = companyWebSiteValidatorUseCase(companyWebsite)
+                    isCompanyWebsiteValid = companyWebsiteResult.success
+                    companyWebsiteError = if (companyWebsiteResult.success) null else companyWebsiteResult.failure
+                    if (!companyWebsiteResult.success) isValid = false
+
+                    if (isValid) {
+                        if (isEditMode) {
+                            viewModel.updateCompany(
+                                company!!.id, // !! is safe here because isEditMode is true
+                                description,
+                                companyName,
+                                companyWebsite,
+                                LocalDate.now().toString(),
+                                applyStatus.status
                             )
-                        )
+                        } else {
+                            viewModel.addCompany(
+                                CompanyEntity(
+                                    id = 0,
+                                    companyName = companyName,
+                                    companyWebSite = companyWebsite,
+                                    description = description,
+                                    lastUpdateDate = LocalDate.now().toString(),
+                                    applyStatus = applyStatus.status
+                                )
+                            )
+                        }
+                        navController.navigate(Route.HomeScreen.route)
                     }
-                    navController.navigate(Route.HomeScreen.route)
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(80.dp)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                enabled = true
             ) {
-                Text(if (isEditMode) "Update Data" else "Add Company")
+                Text(if (isEditMode) AppString.UPDATE_DATA else AppString.ADD_COMPANY)
             }
         }
     }
 }
 
 @Composable
-fun DropdownField(selectedStatus: ApplyStatus, onStatusSelected: (ApplyStatus) -> Unit) {
+fun DropdownField(selectedStatus: ApplyStatus, onStatusSelected: (ApplyStatus) -> Unit, isError: Boolean = false) {
     var expanded by remember { mutableStateOf(false) }
     val applyStatusOptions = ApplyStatus.values()
+    val colorBorder = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .border(width = 2.dp, color = colorBorder)
     ) {
         Text(
             text = selectedStatus.toApplyStatusString(),
@@ -139,7 +200,8 @@ fun DropdownField(selectedStatus: ApplyStatus, onStatusSelected: (ApplyStatus) -
         )
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
         ) {
             applyStatusOptions.forEach { status ->
                 DropdownMenuItem(
@@ -172,18 +234,22 @@ enum class ApplyStatus(val status: Int) {
             NONE -> Color.Gray
             APPLIED -> Color.Green
             REJECTED -> Color.Red
-            INTERVIEW -> Color.Yellow
+            INTERVIEW -> Color.LightGray
             ACCEPTED -> Color(0xFF4CAF50)
         }
     }
 }
 
 fun ApplyStatus.toApplyStatusString(): String {
-    return when (this) {
-        ApplyStatus.NONE -> "None"
-        ApplyStatus.APPLIED -> "Applied"
-        ApplyStatus.REJECTED -> "Rejected"
-        ApplyStatus.INTERVIEW -> "Interview"
-        ApplyStatus.ACCEPTED -> "Accepted"
+
+    for ((index, value) in statusOptions.withIndex()) {
+        return when (this) {
+            ApplyStatus.NONE -> value.takeIf { index == 0 }
+            ApplyStatus.APPLIED -> value.takeIf { index == 1 }
+            ApplyStatus.REJECTED -> value.takeIf { index == 2 }
+            ApplyStatus.INTERVIEW -> value.takeIf { index == 3 }
+            ApplyStatus.ACCEPTED -> value.takeIf { index == 4 }
+        } ?: continue
     }
+    return "Unknown Status"
 }

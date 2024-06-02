@@ -12,7 +12,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +24,7 @@ import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.component.CustomTextField
+import dev.abbasian.applyhistory.ui.theme.AppString
 
 @Composable
 fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewModel, companyId: Int) {
@@ -46,23 +46,23 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     CustomTextField(
                         text = comp.companyName,
                         onValueChange = {},
-                        placeholder = "Company Name",
+                        placeholder = AppString.COMPANY_NAME,
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     CustomTextField(
-                        text = comp.companyWebSite ?: "",
+                        text = comp.companyWebSite,
                         onValueChange = {},
-                        placeholder = "Company Website",
+                        placeholder = AppString.COMPANY_WEBSITE,
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     CustomTextField(
-                        text = comp.description ?: "",
+                        text = comp.description,
                         onValueChange = {},
-                        placeholder = "Description",
+                        placeholder = AppString.DESCRIPTION,
                         readOnly = true,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -72,7 +72,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     CustomTextField(
                         text = comp.applyStatus?.let { ApplyStatus.fromInt(it).name } ?: "",
                         onValueChange = {},
-                        placeholder = "Apply Status",
+                        placeholder = AppString.APPLY_STATUS,
                         readOnly = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -88,7 +88,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                             .padding(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
-                        Text("Delete Company", color = MaterialTheme.colorScheme.onErrorContainer)
+                        Text(AppString.DELETE_COMPANY, color = MaterialTheme.colorScheme.onErrorContainer)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
@@ -101,11 +101,11 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                             .height(80.dp)
                             .padding(16.dp)
                     ) {
-                        Text("Edit Company")
+                        Text(AppString.EDIT_COMPANY)
                     }
                 }
             } ?: Text(
-                "Company not found",
+                AppString.COMPANY_NOT_FOUND,
                 modifier = Modifier
                     .align(Alignment.Center)
             )
