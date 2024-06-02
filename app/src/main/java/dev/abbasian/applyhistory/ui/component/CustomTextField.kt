@@ -8,6 +8,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
@@ -16,6 +18,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import dev.abbasian.applyhistory.core.extension.UiText
 import dev.abbasian.applyhistory.core.extension.isNumber
+import dev.abbasian.applyhistory.domain.model.DataResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,21 +36,31 @@ fun CustomTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     singleLine: Boolean = false,
     maxLine: Int = 1,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    validator: ((String) -> DataResult)? = null
 ) {
     val context = LocalContext.current
     val colorBorder = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+
+    val (internalErrorMessage, setInternalErrorMessage) = remember { mutableStateOf<UiText?>(null) }
+    val (internalIsError, setInternalIsError) = remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
             value = if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
                 if (isNumber(text)) text else ""
             } else text,
-            onValueChange = {
+            onValueChange = { newText ->
                 if (!readOnly) {
                     if (keyboardType == KeyboardType.Phone || keyboardType == KeyboardType.Number) {
-                        if (isNumber(it)) onValueChange(it)
-                    } else onValueChange(it)
+                        if (isNumber(newText)) onValueChange(newText)
+                    } else onValueChange(newText)
+
+                    validator?.let { validate ->
+                        val result = validate(newText)
+                        setInternalIsError(!result.success)
+                        setInternalErrorMessage(result.failure)
+                    }
                 }
             },
             label = { Text(text = placeholder) },
@@ -55,7 +68,7 @@ fun CustomTextField(
             trailingIcon = trailingIcon,
             singleLine = singleLine,
             maxLines = maxLine,
-            isError = isError,
+            isError = isError || internalIsError,
             readOnly = readOnly,
             enabled = !readOnly,
             visualTransformation = if (keyboardType == KeyboardType.Password) {
@@ -75,9 +88,9 @@ fun CustomTextField(
             ),
             modifier = modifier
         )
-        if (isError && errorMessage != null) {
+        if ((isError || internalIsError) && (errorMessage != null || internalErrorMessage != null)) {
             Text(
-                text = errorMessage.asString(context),
+                text = (errorMessage ?: internalErrorMessage)?.asString(context) ?: "",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = modifier
