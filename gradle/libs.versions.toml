@@ -1,0 +1,49 @@
+[versions]
+kotlin = "1.7.10"
+androidGradlePlugin = "8.2.2"
+composeCompiler = "1.3.0"
+androidx-core-ktx = "1.7.0"
+lifecycle-runtime-ktx = "2.7.0"
+lifecycle-livedata-core-ktx = "2.5.1"
+lifecycle-livedata-ktx = "2.5.1"
+lifecycle-extensions = "2.2.0"
+activity-compose = "1.8.2"
+compose-bom = "2023.08.00"
+navigation-compose = "2.8.0-alpha08"
+appcompat = "1.6.1"
+room = "2.4.3"
+kotlinx-coroutines-android = "1.5.2"
+kotlinx-serialization-json = "1.6.3"
+koin = "3.1.2"
+gson = "2.8.9"
+accompanist-systemuicontroller = "0.28.0"
+junit = "4.13.2"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+lifecycle-livedata-core-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-core-ktx", version.ref = "lifecycle-livedata-core-ktx" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
+lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version.ref = "lifecycle-extensions" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
+material3 = { group = "androidx.compose.material3", name = "material3" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
