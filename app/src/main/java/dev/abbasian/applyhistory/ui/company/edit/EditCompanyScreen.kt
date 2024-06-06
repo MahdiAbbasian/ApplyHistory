@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,13 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.business.usecase.company.companyWebSiteValidatorUseCase
 import dev.abbasian.applyhistory.business.usecase.company.emptyFieldValidatorUseCase
-import dev.abbasian.applyhistory.core.extension.UiText
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
+import dev.abbasian.applyhistory.ui.company.CompanyViewEvent
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.component.CustomTextField
 import dev.abbasian.applyhistory.ui.theme.AppString
@@ -47,20 +49,18 @@ fun EditCompanyScreen(
     viewModel: CompanyViewModel,
     company: CompanyEntity? = null
 ) {
-    var companyName by rememberSaveable { mutableStateOf(company?.companyName ?: "") }
-    var companyWebsite by rememberSaveable { mutableStateOf(company?.companyWebSite ?: "") }
-    var description by rememberSaveable { mutableStateOf(company?.description ?: "") }
-    var applyStatus by rememberSaveable {
-        mutableStateOf(company?.applyStatus?.let {
-            ApplyStatus.fromInt(it)
-        } ?: ApplyStatus.NONE)
-    }
+    val companyState by viewModel.companyViewState.observeAsState(EditCompanyViewState())
 
-    var isCompanyWebsiteValid by remember { mutableStateOf(true) }
-    var companyWebsiteError by remember { mutableStateOf<UiText?>(null) }
+    var companyName by rememberSaveable { mutableStateOf(companyState.companyName) }
+    var companyWebsite by rememberSaveable { mutableStateOf(companyState.companyWebsite) }
+    var description by rememberSaveable { mutableStateOf(companyState.description) }
+    var applyStatus by rememberSaveable { mutableStateOf(companyState.applyStatus) }
 
-    var isCompanyNameValid by remember { mutableStateOf(true) }
-    var companyNameError by remember { mutableStateOf<UiText?>(null) }
+    var isCompanyWebsiteValid by remember { mutableStateOf(companyState.isCompanyWebsiteValid) }
+    var companyWebsiteError by remember { mutableStateOf(companyState.companyWebsiteError) }
+
+    var isCompanyNameValid by remember { mutableStateOf(companyState.isCompanyNameValid) }
+    var companyNameError by remember { mutableStateOf(companyState.companyNameError) }
 
     val isEditMode = company != null
 
@@ -146,23 +146,27 @@ fun EditCompanyScreen(
 
                     if (isValid) {
                         if (isEditMode) {
-                            viewModel.updateCompany(
-                                company!!.id, // !! is safe here because isEditMode is true
-                                description,
-                                companyName,
-                                companyWebsite,
-                                LocalDate.now().toString(),
-                                applyStatus.status
+                            viewModel.onEvent(
+                                CompanyViewEvent.UpdateCompany(
+                                    company!!.id, // !! is safe here because isEditMode is true
+                                    description,
+                                    companyName,
+                                    companyWebsite,
+                                    LocalDate.now().toString(),
+                                    applyStatus.status
+                                )
                             )
                         } else {
-                            viewModel.addCompany(
-                                CompanyEntity(
-                                    id = 0,
-                                    companyName = companyName,
-                                    companyWebSite = companyWebsite,
-                                    description = description,
-                                    lastUpdateDate = LocalDate.now().toString(),
-                                    applyStatus = applyStatus.status
+                            viewModel.onEvent(
+                                CompanyViewEvent.AddCompany(
+                                    CompanyEntity(
+                                        id = 0,
+                                        companyName = companyName,
+                                        companyWebSite = companyWebsite,
+                                        description = description,
+                                        lastUpdateDate = LocalDate.now().toString(),
+                                        applyStatus = applyStatus.status
+                                    )
                                 )
                             )
                         }
@@ -189,6 +193,7 @@ fun DropdownField(
     isError: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     val applyStatusOptions = ApplyStatus.values()
     val colorBorder =
         if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(
@@ -205,7 +210,10 @@ fun DropdownField(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true }
+                .clickable {
+                    expanded = true
+                    focusManager.clearFocus()
+                }
         ) {
             Text(
                 text = selectedStatus.toApplyStatusString(),
