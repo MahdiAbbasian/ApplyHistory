@@ -82,5 +82,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.accompanist.systemuicontroller)
     testImplementation(libs.junit)
+    androidTestImplementation(libs.junit.ext)
     androidTestImplementation(platform(libs.compose.bom))
 }
