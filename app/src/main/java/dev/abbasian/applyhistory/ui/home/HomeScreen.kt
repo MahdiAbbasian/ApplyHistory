@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
+import dev.abbasian.applyhistory.ui.company.CompanyViewEvent
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.company.edit.toApplyStatusString
@@ -76,7 +77,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
             CustomTextField(
                 text = searchQuery,
-                onValueChange = { viewModel.updateSearchQuery(it) },
+                onValueChange = { viewModel.onEvent(CompanyViewEvent.SearchCompany(it)) },
                 placeholder = AppString.SEARCH,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -115,9 +116,9 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
             Button(
                 onClick = {
-                    viewModel.exportDataToFile(context) { success, message ->
+                    viewModel.onEvent(CompanyViewEvent.ExportData(context) { success, message ->
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }
+                    })
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
@@ -214,13 +215,15 @@ fun filePickerLauncher(viewModel: CompanyViewModel): ManagedActivityResultLaunch
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             if (uri != null) {
-                viewModel.importDataFromFile(context, uri) { success ->
+                viewModel.onEvent(CompanyViewEvent.ImportData(context, uri) { success ->
                     if (success) {
-                        Toast.makeText(context, AppString.IMPORT_FILE_SUCCESS, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, AppString.IMPORT_FILE_SUCCESS, Toast.LENGTH_SHORT)
+                            .show()
                     } else {
-                        Toast.makeText(context, AppString.IMPORT_FILE_FAILED, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, AppString.IMPORT_FILE_FAILED, Toast.LENGTH_SHORT)
+                            .show()
                     }
-                }
+                })
             }
         }
     )

@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dev.abbasian.applyhistory.Route
+import dev.abbasian.applyhistory.ui.company.CompanyViewEvent
 import dev.abbasian.applyhistory.ui.company.edit.EditCompanyScreen
 import dev.abbasian.applyhistory.ui.company.detail.CompanyDetailScreen
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
                         LaunchedEffect(companyId) {
                             if (companyId != -1) {
-                                viewModel.getCompany(companyId)
+                                viewModel.onEvent(CompanyViewEvent.GetCompanyDetail(companyId))
                             }
                         }
 

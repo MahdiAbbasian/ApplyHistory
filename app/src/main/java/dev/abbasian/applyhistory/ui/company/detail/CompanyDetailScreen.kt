@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
+import dev.abbasian.applyhistory.ui.company.CompanyViewEvent
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
 import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.component.CustomTextField
@@ -30,7 +31,7 @@ import dev.abbasian.applyhistory.ui.theme.AppString
 fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewModel, companyId: Int) {
 
     LaunchedEffect(key1 = companyId) {
-        viewModel.getCompany(companyId)
+        viewModel.onEvent(CompanyViewEvent.GetCompanyDetail(companyId))
     }
 
     val company by viewModel.company.observeAsState()
@@ -79,7 +80,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     Spacer(modifier = Modifier.weight(1f))
                     Button(
                         onClick = {
-                            viewModel.deleteCompany(comp.id)
+                            viewModel.onEvent(CompanyViewEvent.DeleteCompany(comp.id))
                             navController.navigate(Route.HomeScreen.route)
                         },
                         modifier = Modifier
