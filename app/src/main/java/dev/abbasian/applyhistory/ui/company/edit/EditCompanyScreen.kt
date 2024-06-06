@@ -3,6 +3,7 @@ package dev.abbasian.applyhistory.ui.company.edit
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,9 +27,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import dev.abbasian.applyhistory.R
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.business.usecase.company.companyWebSiteValidatorUseCase
 import dev.abbasian.applyhistory.business.usecase.company.emptyFieldValidatorUseCase
@@ -181,38 +183,52 @@ fun EditCompanyScreen(
 }
 
 @Composable
-fun DropdownField(selectedStatus: ApplyStatus, onStatusSelected: (ApplyStatus) -> Unit, isError: Boolean = false) {
+fun DropdownField(
+    selectedStatus: ApplyStatus,
+    onStatusSelected: (ApplyStatus) -> Unit,
+    isError: Boolean = false
+) {
     var expanded by remember { mutableStateOf(false) }
     val applyStatusOptions = ApplyStatus.values()
-    val colorBorder = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+    val colorBorder =
+        if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary.copy(
+            alpha = 0.3f
+        )
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .border(width = 2.dp, color = colorBorder)
     ) {
-        Text(
-            text = selectedStatus.toApplyStatusString(),
+        val boxWidth = constraints.maxWidth
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = true }
-                .padding(16.dp)
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
         ) {
-            applyStatusOptions.forEach { status ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = status.toApplyStatusString())
-                    },
-                    onClick = {
-                        onStatusSelected(status)
-                        expanded = false
-                    }
-                )
+            Text(
+                text = selectedStatus.toApplyStatusString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(with(LocalDensity.current) { boxWidth.toDp() })
+            ) {
+                applyStatusOptions.forEach { status ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = status.toApplyStatusString(), color = Color.LightGray, modifier = Modifier.padding(16.dp))
+                        },
+                        onClick = {
+                            onStatusSelected(status)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
