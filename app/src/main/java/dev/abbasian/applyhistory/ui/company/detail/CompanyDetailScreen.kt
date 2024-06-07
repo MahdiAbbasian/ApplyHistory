@@ -81,7 +81,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     Button(
                         onClick = {
                             viewModel.onEvent(CompanyViewEvent.DeleteCompany(comp.id))
-                            navController.navigate(Route.HomeScreen.route)
+                            navController.navigate(Route.HomeScreen)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -94,8 +94,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
                         onClick = {
-                            val route = Route.EditCompanyScreen.createRoute(companyId = comp.id)
-                            navController.navigate(route)
+                            navController.navigate(Route.editCompanyScreen(comp.id))
                         },
                         modifier = Modifier
                             .fillMaxWidth()

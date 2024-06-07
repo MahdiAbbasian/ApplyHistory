@@ -20,7 +20,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,6 +34,7 @@ import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
 import dev.abbasian.applyhistory.business.usecase.company.companyWebSiteValidatorUseCase
 import dev.abbasian.applyhistory.business.usecase.company.emptyFieldValidatorUseCase
+import dev.abbasian.applyhistory.core.extension.UiText
 import dev.abbasian.applyhistory.domain.model.CompanyEntity
 import dev.abbasian.applyhistory.ui.company.CompanyViewEvent
 import dev.abbasian.applyhistory.ui.company.CompanyViewModel
@@ -49,18 +49,21 @@ fun EditCompanyScreen(
     viewModel: CompanyViewModel,
     company: CompanyEntity? = null
 ) {
-    val companyState by viewModel.companyViewState.observeAsState(EditCompanyViewState())
 
-    var companyName by rememberSaveable { mutableStateOf(companyState.companyName) }
-    var companyWebsite by rememberSaveable { mutableStateOf(companyState.companyWebsite) }
-    var description by rememberSaveable { mutableStateOf(companyState.description) }
-    var applyStatus by rememberSaveable { mutableStateOf(companyState.applyStatus) }
+    var companyName by rememberSaveable { mutableStateOf(company?.companyName ?: "") }
+    var companyWebsite by rememberSaveable { mutableStateOf(company?.companyWebSite ?: "") }
+    var description by rememberSaveable { mutableStateOf(company?.description ?: "") }
+    var applyStatus by rememberSaveable {
+        mutableStateOf(company?.applyStatus?.let {
+            ApplyStatus.fromInt(it)
+        } ?: ApplyStatus.NONE)
+    }
 
-    var isCompanyWebsiteValid by remember { mutableStateOf(companyState.isCompanyWebsiteValid) }
-    var companyWebsiteError by remember { mutableStateOf(companyState.companyWebsiteError) }
+    var isCompanyWebsiteValid by remember { mutableStateOf(true) }
+    var companyWebsiteError by remember { mutableStateOf<UiText?>(null) }
 
-    var isCompanyNameValid by remember { mutableStateOf(companyState.isCompanyNameValid) }
-    var companyNameError by remember { mutableStateOf(companyState.companyNameError) }
+    var isCompanyNameValid by remember { mutableStateOf(true) }
+    var companyNameError by remember { mutableStateOf<UiText?>(null) }
 
     val isEditMode = company != null
 
@@ -170,7 +173,7 @@ fun EditCompanyScreen(
                                 )
                             )
                         }
-                        navController.navigate(Route.HomeScreen.route)
+                        navController.navigate(Route.HomeScreen)
                     }
                 },
                 modifier = Modifier

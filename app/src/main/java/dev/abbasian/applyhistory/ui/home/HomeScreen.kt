@@ -59,7 +59,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate(Route.AddCompanyScreen.route)
+                navController.navigate(Route.AddCompanyScreen)
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "add_edit_company_screen")
             }
@@ -141,7 +141,7 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredCompanyList) { company ->
                     CompanyItems(company = company, onClick = {
-                        val route = Route.CompanyDetailScreen.createRoute(company.id)
+                        val route = Route.companyDetailScreen(company.id)
                         navController.navigate(route)
                     })
                 }

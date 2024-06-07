@@ -31,15 +31,15 @@ class MainActivity : AppCompatActivity() {
             ApplyHistoryTheme {
                 val navController = rememberNavController()
                 val viewModel: CompanyViewModel = getViewModel()
-                NavHost(navController = navController, startDestination = Route.HomeScreen.route) {
-                    composable(route = Route.HomeScreen.route) {
+                NavHost(navController = navController, startDestination = Route.HomeScreen) {
+                    composable(route = Route.HomeScreen) {
                         HomeScreen(navController, viewModel)
                     }
-                    composable(route = Route.AddCompanyScreen.route) {
+                    composable(route = Route.AddCompanyScreen) {
                         EditCompanyScreen(navController, viewModel, null)
                     }
                     composable(
-                        route = Route.EditCompanyScreen.route,
+                        route = Route.EditCompany().route,
                         arguments = listOf(navArgument("companyId") {
                             type = NavType.IntType
                         })
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                         EditCompanyScreen(navController, viewModel, company)
                     }
                     composable(
-                        route = Route.CompanyDetailScreen.route,
+                        route = Route.CompanyDetail().route,
                         arguments = listOf(navArgument("companyId") { type = NavType.IntType })
                     ) {
                         val companyId = it.arguments?.getInt("companyId")
