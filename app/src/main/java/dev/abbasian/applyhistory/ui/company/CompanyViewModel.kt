@@ -2,6 +2,7 @@ package dev.abbasian.applyhistory.ui.company
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -142,12 +143,14 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
                 val jsonData = Gson().toJson(companies)
                 val encryptedData = encrypt(jsonData)
 
+                // Use external public directory
                 val fileName = "exported_companies.txt"
-                val internalStorageDir = File(context.filesDir, "android/data/dev.abbasian.applyhistory")
-                if (!internalStorageDir.exists()) {
-                    internalStorageDir.mkdirs()
+                val externalStorageDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                if (!externalStorageDir.exists()) {
+                    externalStorageDir.mkdirs()
                 }
-                val file = File(internalStorageDir, fileName)
+                val file = File(externalStorageDir, fileName)
                 file.writeText(encryptedData)
 
                 withContext(Dispatchers.Main) {
