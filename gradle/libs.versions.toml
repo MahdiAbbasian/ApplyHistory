@@ -18,7 +18,12 @@ koin = "3.1.2"
 gson = "2.8.9"
 accompanist-systemuicontroller = "0.28.0"
 junit = "4.13.2"
+mockk = "1.12.2"
+robolectric = "4.7.3"
 junitExt = "1.1.5"
+composeUiTestJunit4 = "1.0.0"
+navigationTesting = "2.3.5"
+uiTestJunit4Android = "1.6.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -43,7 +48,12 @@ koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 junit-ext = { module = "androidx.test.ext:junit", version.ref = "junitExt" }
+compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "composeUiTestJunit4" }
+navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

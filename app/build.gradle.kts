@@ -57,6 +57,12 @@ android {
         create("cleanedAnnotations")
         implementation.get().exclude(group = "org.jetbrains", module = "annotations")
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -81,7 +87,12 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.gson)
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.junit.ext)
     androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.navigation.testing)
 }
