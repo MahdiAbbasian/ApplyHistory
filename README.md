@@ -14,7 +14,7 @@ Welcome to **ApplyHistory**! This project is a secure date recording app for peo
 - **Robolectric**: By using the robot pattern, you can combine and chain them into various tests with different goals.
 ## published
 
-You can find the latest versions of ApplyHistory [here](https://github.com/yourusername/ApplyHistory/releases).
+You can find the latest versions of ApplyHistory [here](https://github.com/MahdiAbbasian/ApplyHistory/releases).
 
 ## screen shot
 
