@@ -87,7 +87,6 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.gson)
     implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.robolectric)

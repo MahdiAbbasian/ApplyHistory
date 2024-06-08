@@ -23,6 +23,7 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.time.LocalDate
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
@@ -218,7 +219,7 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
             description,
             companyName,
             companyWebsite,
-            null,
+            LocalDate.now().toString(),
             applyStatus
         )
         loadCompanies()
