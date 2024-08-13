@@ -2,7 +2,9 @@ package dev.abbasian.applyhistory.ui.theme
 object AppString {
     const val SEARCH = "search"
     const val EXPORT_TO_FILE = "Export to file"
+    const val EXPORTED_FILE_NOT_FOUND = "No exported file found to display from storage"
     const val IMPORT_FROM_FILE = "Import from file"
+    const val SELECTED_FILE_TO_IMPORT = "Select a file to import"
     const val IMPORT_FILE_SUCCESS = "Import file Success"
     const val IMPORT_FILE_FAILED = "Import file Failed"
     const val TOTAL_APPLICATIONS = "Total Applications:"
@@ -15,6 +17,7 @@ object AppString {
     const val EDIT_COMPANY = "Edit company"
     const val DELETE_COMPANY = "Delete company"
     const val COMPANY_NOT_FOUND = "Company not found"
+    const val CANCEL = "cancel"
 
     val statusOptions = listOf("None", "Applied", "Rejected", "Interview", "Accepted")
 }

@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +21,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,12 +33,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.abbasian.applyhistory.Route
@@ -46,6 +55,7 @@ import dev.abbasian.applyhistory.ui.company.edit.ApplyStatus
 import dev.abbasian.applyhistory.ui.company.edit.toApplyStatusString
 import dev.abbasian.applyhistory.ui.component.CustomTextField
 import dev.abbasian.applyhistory.ui.theme.AppString
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -55,6 +65,19 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
     val context: Context = LocalContext.current
     val filePickerLauncher = filePickerLauncher(viewModel)
+    val isScanning by viewModel.isScanning.observeAsState(false)
+    val foundFiles by viewModel.foundFiles.observeAsState(emptyList())
+    var showScanResultDialog by remember { mutableStateOf(false) }
+    var importFileSuccess by remember { mutableStateOf(false) }
+    var showNoFileFoundMessage by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(CompanyViewEvent.ScanExportedFiles(context))
+    }
+
+    LaunchedEffect(Unit) {
+        showNoFileFoundMessage = foundFiles.isEmpty() || !isScanning || importFileSuccess || !showScanResultDialog
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -66,84 +89,128 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
         },
     ) { innerPadding ->
 
-        Column(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
         ) {
-            val searchQuery by viewModel.searchQuery.observeAsState("")
-            val filteredCompanyList by viewModel.filteredCompaniesList.observeAsState(emptyList())
-
-            CustomTextField(
-                text = searchQuery,
-                onValueChange = { viewModel.onEvent(CompanyViewEvent.SearchCompany(it)) },
-                placeholder = AppString.SEARCH,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                modifier = Modifier.padding(8.dp),
-                shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                val searchQuery by viewModel.searchQuery.observeAsState("")
+                val filteredCompanyList by viewModel.filteredCompaniesList.observeAsState(emptyList())
+
+                CustomTextField(
+                    text = searchQuery,
+                    onValueChange = { viewModel.onEvent(CompanyViewEvent.SearchCompany(it)) },
+                    placeholder = AppString.SEARCH,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    modifier = Modifier.padding(8.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-                    Text(
-                        text = AppString.TOTAL_APPLICATIONS,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${filteredCompanyList.size}",
-                        style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = AppString.TOTAL_APPLICATIONS,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "${filteredCompanyList.size}",
+                            style = MaterialTheme.typography.displayMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    viewModel.onEvent(CompanyViewEvent.ExportData(context) { success, message ->
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    })
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(AppString.EXPORT_TO_FILE)
-            }
+                Button(
+                    onClick = {
+                        viewModel.onEvent(CompanyViewEvent.ExportData(context) { success, message ->
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        })
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                ) {
+                    Text(AppString.EXPORT_TO_FILE)
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    filePickerLauncher.launch("text/plain")
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(AppString.IMPORT_FROM_FILE)
-            }
+                Button(
+                    onClick = {
+                        filePickerLauncher.launch("text/plain")
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                ) {
+                    Text(AppString.IMPORT_FROM_FILE)
+                }
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(filteredCompanyList) { company ->
-                    CompanyItems(company = company, onClick = {
-                        val route = Route.companyDetailScreen(company.id)
-                        navController.navigate(route)
-                    })
+                when {
+                    isScanning -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                    foundFiles.isNotEmpty() || importFileSuccess -> {
+                        if (showScanResultDialog && foundFiles.isNotEmpty()) {
+                            FileSelectionDialog(
+                                files = foundFiles,
+                                onDismiss = { showScanResultDialog = false },
+                                onFileSelected = { file ->
+                                    viewModel.onEvent(CompanyViewEvent.ImportData(context, Uri.fromFile(file)) { success ->
+                                        val message = if (success) AppString.IMPORT_FILE_SUCCESS else AppString.IMPORT_FILE_FAILED
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                        if (success) {
+                                            importFileSuccess = true
+                                            showScanResultDialog = false
+                                            viewModel.scanForExportedFiles(context)
+                                        }
+                                    })
+                                }
+                            )
+                        }
+                    }
+                    showNoFileFoundMessage -> {
+                        Text(
+                            text = AppString.EXPORTED_FILE_NOT_FOUND,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(filteredCompanyList) { company ->
+                        CompanyItems(company = company, onClick = {
+                            val route = Route.companyDetailScreen(company.id)
+                            navController.navigate(route)
+                        })
+                    }
                 }
             }
         }
@@ -229,4 +296,35 @@ fun filePickerLauncher(viewModel: CompanyViewModel): ManagedActivityResultLaunch
     )
 
     return filePickerLauncher
+}
+
+@Composable
+fun FileSelectionDialog(files: List<File>, onDismiss: () -> Unit, onFileSelected: (File) -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text(text = AppString.SELECTED_FILE_TO_IMPORT) },
+        text = {
+            LazyColumn {
+                items(files) { file ->
+                    Text(
+                        text = file.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onFileSelected(file)
+                                onDismiss()
+                            }
+                            .padding(8.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(AppString.CANCEL)
+            }
+        }
+    )
 }

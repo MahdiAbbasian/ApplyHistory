@@ -6,6 +6,7 @@ import dev.abbasian.applyhistory.domain.model.CompanyEntity
 
 sealed class CompanyViewEvent {
     object LoadCompanies : CompanyViewEvent()
+    data class ScanExportedFiles(val context: Context) : CompanyViewEvent()
     data class SearchCompany(val query: String) : CompanyViewEvent()
     data class ExportData(val context: Context, val onCompletion: (Boolean, String) -> Unit) : CompanyViewEvent()
     data class ImportData(val context: Context, val uri: Uri, val onCompletion: (Boolean) -> Unit) : CompanyViewEvent()

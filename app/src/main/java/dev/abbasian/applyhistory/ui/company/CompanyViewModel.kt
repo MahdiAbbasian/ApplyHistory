@@ -23,8 +23,11 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Base64
+import java.util.Date
+import java.util.Locale
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -53,6 +56,12 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
     private val _companyViewState = MutableLiveData<EditCompanyViewState>()
     val companyViewState: LiveData<EditCompanyViewState> = _companyViewState
 
+    private val _isScanning = MutableLiveData<Boolean>(false)
+    val isScanning: LiveData<Boolean> = _isScanning
+
+    private val _foundFiles = MutableLiveData<List<File>>()
+    val foundFiles: LiveData<List<File>> = _foundFiles
+
     init {
         _filteredCompaniesList.addSource(companiesList) { companies ->
             filterCompanies(companies, _searchQuery.value ?: "")
@@ -73,6 +82,7 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
 
     fun onEvent(event: CompanyViewEvent) {
         when (event) {
+            is CompanyViewEvent.ScanExportedFiles -> scanForExportedFiles(event.context)
             is CompanyViewEvent.LoadCompanies -> loadCompanies()
             is CompanyViewEvent.SearchCompany -> updateSearchQuery(event.query)
             is CompanyViewEvent.ExportData -> exportDataToFile(event.context, event.onCompletion)
@@ -88,6 +98,18 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
                 event.applyStatus
             )
         }
+    }
+
+    fun scanForExportedFiles(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        _isScanning.postValue(true)
+
+        val externalStorageDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        val files = externalStorageDir?.listFiles()?.filter {
+            it.name.startsWith("exported_companies") && it.name.endsWith(".txt")
+        } ?: emptyList()
+
+        _foundFiles.postValue(files)
+        _isScanning.postValue(false)
     }
 
     private fun loadCompanies() {
@@ -141,13 +163,14 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
                     }
                     return@launch
                 }
+
                 val jsonData = Gson().toJson(companies)
                 val encryptedData = encrypt(jsonData)
 
                 // Use external public directory
-                val fileName = "exported_companies.txt"
-                val externalStorageDir =
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val fileName = "exported_companies_$timestamp.txt"
+                val externalStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
                 if (!externalStorageDir.exists()) {
                     externalStorageDir.mkdirs()
                 }
@@ -185,6 +208,7 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
 
                 withContext(Dispatchers.Main) {
                     onCompletion(true)
+                    scanForExportedFiles(context)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
