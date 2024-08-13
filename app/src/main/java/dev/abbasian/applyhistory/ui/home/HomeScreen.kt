@@ -67,16 +67,15 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
     val filePickerLauncher = filePickerLauncher(viewModel)
     val isScanning by viewModel.isScanning.observeAsState(false)
     val foundFiles by viewModel.foundFiles.observeAsState(emptyList())
-    var showScanResultDialog by remember { mutableStateOf(false) }
-    var importFileSuccess by remember { mutableStateOf(false) }
     var showNoFileFoundMessage by remember { mutableStateOf(false) }
+    val importStatus by viewModel.importStatus.observeAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.onEvent(CompanyViewEvent.ScanExportedFiles(context))
+        viewModel.scanForExportedFile(context)
     }
 
-    LaunchedEffect(Unit) {
-        showNoFileFoundMessage = foundFiles.isEmpty() || !isScanning || importFileSuccess || !showScanResultDialog
+    LaunchedEffect(foundFiles, isScanning) {
+        showNoFileFoundMessage = foundFiles.isEmpty() && !isScanning
     }
 
     Scaffold(
@@ -170,26 +169,18 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                    foundFiles.isNotEmpty() || importFileSuccess -> {
-                        if (showScanResultDialog && foundFiles.isNotEmpty()) {
-                            FileSelectionDialog(
-                                files = foundFiles,
-                                onDismiss = { showScanResultDialog = false },
-                                onFileSelected = { file ->
-                                    viewModel.onEvent(CompanyViewEvent.ImportData(context, Uri.fromFile(file)) { success ->
-                                        val message = if (success) AppString.IMPORT_FILE_SUCCESS else AppString.IMPORT_FILE_FAILED
-                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                        if (success) {
-                                            importFileSuccess = true
-                                            showScanResultDialog = false
-                                            viewModel.scanForExportedFiles(context)
-                                        }
-                                    })
-                                }
-                            )
-                        }
+                    importStatus == CompanyViewModel.ImportStatus.SUCCESS -> {
+                        Text(
+                            text = AppString.IMPORT_FILE_SUCCESS,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
-                    showNoFileFoundMessage -> {
+                    importStatus == CompanyViewModel.ImportStatus.NO_FILE -> {
                         Text(
                             text = AppString.EXPORTED_FILE_NOT_FOUND,
                             textAlign = TextAlign.Center,
