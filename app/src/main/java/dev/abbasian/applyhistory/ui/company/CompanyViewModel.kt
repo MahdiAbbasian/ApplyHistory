@@ -32,8 +32,9 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() {
-
+class CompanyViewModel(
+    private val repository: CompanyRepository,
+) : ViewModel() {
     companion object {
         private const val AES_MODE = "AES/CBC/PKCS5PADDING"
         private const val CHARSET_NAME = "UTF-8"
@@ -42,12 +43,16 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
     }
 
     enum class ImportStatus {
-        SUCCESS, FAILURE, NO_FILE
+        SUCCESS,
+        FAILURE,
+        NO_FILE,
+        NONE,
     }
 
     private var debounceJob: Job? = null
 
-    private val companiesList: LiveData<List<CompanyEntity>> = repository.getCompanies().asLiveData()
+    private val companiesList: LiveData<List<CompanyEntity>> =
+        repository.getCompanies().asLiveData()
     private val _company = MutableLiveData<CompanyEntity?>()
     val company: LiveData<CompanyEntity?> = _company
 
@@ -79,12 +84,14 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         }
         loadCompanies()
     }
+
     private fun debounceFilter(query: String) {
         debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
-            delay(300L) // 300 milliseconds debounce time
-            filterCompanies(companiesList.value ?: emptyList(), query)
-        }
+        debounceJob =
+            viewModelScope.launch {
+                delay(300L) // 300 milliseconds debounce time
+                filterCompanies(companiesList.value ?: emptyList(), query)
+            }
     }
 
     fun onEvent(event: CompanyViewEvent) {
@@ -93,47 +100,58 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
             is CompanyViewEvent.LoadCompanies -> loadCompanies()
             is CompanyViewEvent.SearchCompany -> updateSearchQuery(event.query)
             is CompanyViewEvent.ExportData -> exportDataToFile(event.context, event.onCompletion)
-            is CompanyViewEvent.ImportData -> importDataFromFile(event.context, event.uri, event.onCompletion)
+            is CompanyViewEvent.ImportData ->
+                importDataFromFile(
+                    event.context,
+                    event.uri,
+                    event.onCompletion,
+                )
+
             is CompanyViewEvent.GetCompanyDetail -> getCompany(event.companyId)
             is CompanyViewEvent.DeleteCompany -> deleteCompany(event.companyId)
             is CompanyViewEvent.AddCompany -> addCompany(event.company)
-            is CompanyViewEvent.UpdateCompany -> updateCompany(
-                event.id,
-                event.companyName,
-                event.companyWebsite,
-                event.description,
-                event.applyStatus
-            )
+            is CompanyViewEvent.UpdateCompany ->
+                updateCompany(
+                    event.id,
+                    event.companyName,
+                    event.companyWebsite,
+                    event.description,
+                    event.applyStatus,
+                )
         }
     }
 
-    fun scanForExportedFile(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        _isScanning.postValue(true)
+    fun scanForExportedFile(context: Context) =
+        viewModelScope.launch(Dispatchers.IO) {
+            _isScanning.postValue(true)
 
-        val externalStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-        val files = externalStorageDir.listFiles { file ->
-            file.name.startsWith("exported_companies_") && file.name.endsWith(".txt")
-        }?.toList() ?: emptyList()
+            val externalStorageDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+            val files =
+                externalStorageDir
+                    .listFiles { file ->
+                        file.name.startsWith("exported_companies_") && file.name.endsWith(".txt")
+                    }?.toList() ?: emptyList()
 
-        _foundFiles.postValue(files)
+            _foundFiles.postValue(files)
 
-        if (files.isNotEmpty()) {
-            val latestFile = files.sortedByDescending { it.lastModified() }.first()
-            importDataFromFile(context, Uri.fromFile(latestFile)) { success ->
-                if (success) {
-                    _importStatus.postValue(ImportStatus.SUCCESS)
-                } else {
-                    _importStatus.postValue(ImportStatus.FAILURE)
+            if (files.isNotEmpty()) {
+                val latestFile = files.sortedByDescending { it.lastModified() }.first()
+                importDataFromFile(context, Uri.fromFile(latestFile)) { success ->
+                    if (success) {
+                        _importStatus.postValue(ImportStatus.SUCCESS)
+                    } else {
+                        _importStatus.postValue(ImportStatus.FAILURE)
+                    }
                 }
+            } else {
+                _importStatus.postValue(ImportStatus.NO_FILE)
             }
-        } else {
-            _importStatus.postValue(ImportStatus.NO_FILE)
+
+            _isScanning.postValue(false)
         }
 
-        _isScanning.postValue(false)
-    }
-
-    private fun loadCompanies() {
+    fun loadCompanies() {
         viewModelScope.launch {
             val companies = repository.getCompanies().first()
             _filteredCompaniesList.value = companies
@@ -145,12 +163,16 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         debounceFilter(query)
     }
 
-    private fun filterCompanies(companies: List<CompanyEntity>, query: String) {
-        val filteredList = if (query.isEmpty()) {
-            companies
-        } else {
-            companies.filter { it.companyName.contains(query, ignoreCase = true) }
-        }
+    private fun filterCompanies(
+        companies: List<CompanyEntity>,
+        query: String,
+    ) {
+        val filteredList =
+            if (query.isEmpty()) {
+                companies
+            } else {
+                companies.filter { it.companyName.contains(query, ignoreCase = true) }
+            }
         _filteredCompaniesList.value = filteredList
     }
 
@@ -174,94 +196,107 @@ class CompanyViewModel(private val repository: CompanyRepository) : ViewModel() 
         return String(decryptedBytes)
     }
 
-    private fun exportDataToFile(context: Context, onCompletion: (Boolean, String) -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val companies = repository.getCompanies().first()
-                if (companies.isEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        onCompletion(false, "No data to export")
-                    }
-                    return@launch
+    private fun exportDataToFile(
+        context: Context,
+        onCompletion: (Boolean, String) -> Unit,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val companies = repository.getCompanies().first()
+            if (companies.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    onCompletion(false, "No data to export")
                 }
+                return@launch
+            }
 
-                val jsonData = Gson().toJson(companies)
-                val encryptedData = encrypt(jsonData)
+            val jsonData = Gson().toJson(companies)
+            val encryptedData = encrypt(jsonData)
 
-                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                val fileName = "exported_companies_$timestamp.txt"
-                val externalStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-                if (!externalStorageDir.exists()) {
-                    externalStorageDir.mkdirs()
-                }
+            val timestamp =
+                SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val fileName = "exported_companies_$timestamp.txt"
+            val externalStorageDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+            if (!externalStorageDir.exists()) {
+                externalStorageDir.mkdirs()
+            }
 
-                val previousFiles = externalStorageDir.listFiles { file ->
+            val previousFiles =
+                externalStorageDir.listFiles { file ->
                     file.name.startsWith("exported_companies_") && file.name.endsWith(".txt")
                 }
-                previousFiles?.forEach { it.delete() }
+            previousFiles?.forEach { it.delete() }
 
-                val file = File(externalStorageDir, fileName)
-                file.writeText(encryptedData)
+            val file = File(externalStorageDir, fileName)
+            file.writeText(encryptedData)
 
-                withContext(Dispatchers.Main) {
-                    onCompletion(true, "File saved successfully at: ${file.absolutePath}")
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    onCompletion(false, "Error exporting data")
-                }
+            withContext(Dispatchers.Main) {
+                onCompletion(true, "File saved successfully at: ${file.absolutePath}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                onCompletion(false, "Error exporting data")
             }
         }
+    }
 
-    fun importDataFromFile(context: Context, uri: Uri, onCompletion: (Boolean) -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val reader = BufferedReader(InputStreamReader(inputStream))
-                val data = reader.readLines().joinToString("\n")
-                reader.close()
-                inputStream?.close()
+    private fun importDataFromFile(
+        context: Context,
+        uri: Uri,
+        onCompletion: (Boolean) -> Unit,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val data = reader.readLines().joinToString("\n")
+            reader.close()
+            inputStream?.close()
 
-                val decryptedData = decrypt(data)
+            val decryptedData = decrypt(data)
 
-                val type = object : TypeToken<List<CompanyEntity>>() {}.type
-                val importedCompanies: List<CompanyEntity> = Gson().fromJson(decryptedData, type)
+            val type = object : TypeToken<List<CompanyEntity>>() {}.type
+            val importedCompanies: List<CompanyEntity> = Gson().fromJson(decryptedData, type)
 
-                importedCompanies.forEach { company ->
-                    repository.addCompany(company)
-                }
+            importedCompanies.forEach { company ->
+                repository.addCompany(company)
+            }
 
-                withContext(Dispatchers.Main) {
-                    onCompletion(true)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    onCompletion(false)
-                }
+            withContext(Dispatchers.Main) {
+                onCompletion(true)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                onCompletion(false)
             }
         }
-
-    private fun getCompany(id: Int) = viewModelScope.launch {
-        _company.value = repository.getCompany(id)
     }
 
-    private fun deleteCompany(id: Int) = viewModelScope.launch {
-        repository.deleteCompany(id)
-    }
+    private fun getCompany(id: Int) =
+        viewModelScope.launch {
+            _company.value = repository.getCompany(id)
+        }
 
-    private fun addCompany(company: CompanyEntity) = viewModelScope.launch {
-        repository.addCompany(company)
-        loadCompanies()
-    }
+    fun deleteCompany(id: Int) =
+        viewModelScope.launch {
+            repository.deleteCompany(id)
+            _foundFiles.value = emptyList()
+            _importStatus.value = ImportStatus.NONE
+        }
+
+    private fun addCompany(company: CompanyEntity) =
+        viewModelScope.launch {
+            repository.addCompany(company)
+            loadCompanies()
+        }
 
     private fun updateCompany(
         id: Int,
         companyName: String?,
         companyWebsite: String?,
         description: String?,
-        applyStatus: Int?
+        applyStatus: Int?,
     ) = viewModelScope.launch {
         repository.updateCompany(
             id,

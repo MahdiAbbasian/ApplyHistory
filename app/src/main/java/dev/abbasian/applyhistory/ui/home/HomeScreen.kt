@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,6 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -61,8 +63,10 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
-
+fun HomeScreen(
+    navController: NavController,
+    viewModel: CompanyViewModel,
+) {
     val context: Context = LocalContext.current
     val filePickerLauncher = filePickerLauncher(viewModel)
     val isScanning by viewModel.isScanning.observeAsState(false)
@@ -87,15 +91,15 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
             }
         },
     ) { innerPadding ->
-
         Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .fillMaxSize()
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .fillMaxSize(),
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 val searchQuery by viewModel.searchQuery.observeAsState("")
                 val filteredCompanyList by viewModel.filteredCompaniesList.observeAsState(emptyList())
@@ -104,35 +108,37 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                     text = searchQuery,
                     onValueChange = { viewModel.onEvent(CompanyViewEvent.SearchCompany(it)) },
                     placeholder = AppString.SEARCH,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
                     modifier = Modifier.padding(8.dp),
                     shape = MaterialTheme.shapes.medium,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier =
+                            Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = AppString.TOTAL_APPLICATIONS,
                             style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "${filteredCompanyList.size}",
                             style = MaterialTheme.typography.displayMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -141,12 +147,16 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
 
                 Button(
                     onClick = {
-                        viewModel.onEvent(CompanyViewEvent.ExportData(context) { success, message ->
-                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                        })
-                    }, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
+                        viewModel.onEvent(
+                            CompanyViewEvent.ExportData(context) { success, message ->
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            },
+                        )
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
                 ) {
                     Text(AppString.EXPORT_TO_FILE)
                 }
@@ -156,9 +166,11 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                 Button(
                     onClick = {
                         filePickerLauncher.launch("text/plain")
-                    }, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
                 ) {
                     Text(AppString.IMPORT_FROM_FILE)
                 }
@@ -166,81 +178,118 @@ fun HomeScreen(navController: NavController, viewModel: CompanyViewModel) {
                 when {
                     isScanning -> {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
                         )
                     }
+
                     importStatus == CompanyViewModel.ImportStatus.SUCCESS -> {
                         Text(
                             text = AppString.IMPORT_FILE_SUCCESS,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(16.dp),
+                            modifier =
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(16.dp),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
+
                     importStatus == CompanyViewModel.ImportStatus.NO_FILE -> {
                         Text(
                             text = AppString.EXPORTED_FILE_NOT_FOUND,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(16.dp),
+                            modifier =
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(16.dp),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
                         )
+                    }
+
+                    importStatus == CompanyViewModel.ImportStatus.NONE -> {
+                        // TODO
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(filteredCompanyList) { company ->
-                        CompanyItems(company = company, onClick = {
-                            val route = Route.companyDetailScreen(company.id)
-                            navController.navigate(route)
-                        })
-                    }
-                }
+                CompanyListView(
+                    filteredCompanyList = filteredCompanyList,
+                    onCompanyClick = { companyId ->
+                        navController.navigate(Route.companyDetailScreen(companyId))
+                    },
+                    onDeleteCompany = { companyId ->
+                        viewModel.deleteCompany(companyId)
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-fun CompanyItems(company: CompanyEntity, onClick: () -> Unit) {
+fun CompanyListView(
+    filteredCompanyList: List<CompanyEntity>,
+    onCompanyClick: (Int) -> Unit,
+    onDeleteCompany: (Int) -> Unit,
+) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(filteredCompanyList) { company ->
+            CompanyItems(company = company, onClick = {
+                onCompanyClick(company.id)
+            }, onDeleteClick = {
+                onDeleteCompany(company.id)
+            })
+        }
+    }
+}
+
+@Composable
+fun CompanyItems(
+    company: CompanyEntity,
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(8.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(8.dp),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 ApplyStatusChip(applyStatus = ApplyStatus.fromInt(company.applyStatus ?: 0))
                 Text(
                     text = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date()),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
+                IconButton(onClick = onDeleteClick) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete Company")
+                }
             }
             Divider(modifier = Modifier.padding(horizontal = 16.dp))
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Text(text = company.companyName, style = MaterialTheme.typography.bodyLarge)
                 Text(text = company.companyWebSite, style = MaterialTheme.typography.bodyMedium)
@@ -255,12 +304,12 @@ fun ApplyStatusChip(applyStatus: ApplyStatus) {
     Surface(
         color = applyStatus.toColor(),
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
+        modifier = Modifier,
     ) {
         Text(
             text = applyStatus.toApplyStatusString(),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
@@ -269,28 +318,37 @@ fun ApplyStatusChip(applyStatus: ApplyStatus) {
 fun filePickerLauncher(viewModel: CompanyViewModel): ManagedActivityResultLauncher<String, Uri?> {
     val context = LocalContext.current
 
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            if (uri != null) {
-                viewModel.onEvent(CompanyViewEvent.ImportData(context, uri) { success ->
-                    if (success) {
-                        Toast.makeText(context, AppString.IMPORT_FILE_SUCCESS, Toast.LENGTH_SHORT)
-                            .show()
-                    } else {
-                        Toast.makeText(context, AppString.IMPORT_FILE_FAILED, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                })
-            }
-        }
-    )
+    val filePickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+            onResult = { uri: Uri? ->
+                if (uri != null) {
+                    viewModel.onEvent(
+                        CompanyViewEvent.ImportData(context, uri) { success ->
+                            if (success) {
+                                Toast
+                                    .makeText(context, AppString.IMPORT_FILE_SUCCESS, Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast
+                                    .makeText(context, AppString.IMPORT_FILE_FAILED, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
+                    )
+                }
+            },
+        )
 
     return filePickerLauncher
 }
 
 @Composable
-fun FileSelectionDialog(files: List<File>, onDismiss: () -> Unit, onFileSelected: (File) -> Unit) {
+fun FileSelectionDialog(
+    files: List<File>,
+    onDismiss: () -> Unit,
+    onFileSelected: (File) -> Unit,
+) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text(text = AppString.SELECTED_FILE_TO_IMPORT) },
@@ -299,14 +357,15 @@ fun FileSelectionDialog(files: List<File>, onDismiss: () -> Unit, onFileSelected
                 items(files) { file ->
                     Text(
                         text = file.name,
-                        modifier = Modifier
+                        modifier =
+                            Modifier
                             .fillMaxWidth()
                             .clickable {
                                 onFileSelected(file)
                                 onDismiss()
                             }
                             .padding(8.dp),
-                        style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }

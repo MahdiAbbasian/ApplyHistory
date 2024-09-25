@@ -28,8 +28,11 @@ import dev.abbasian.applyhistory.ui.component.CustomTextField
 import dev.abbasian.applyhistory.ui.theme.AppString
 
 @Composable
-fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewModel, companyId: Int) {
-
+fun CompanyDetailScreen(
+    navController: NavController,
+    viewModel: CompanyViewModel,
+    companyId: Int,
+) {
     LaunchedEffect(key1 = companyId) {
         viewModel.onEvent(CompanyViewEvent.GetCompanyDetail(companyId))
     }
@@ -38,18 +41,19 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
-
             company?.let { comp ->
-                Column(modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
+                Column(
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                 ) {
                     CustomTextField(
                         text = comp.companyName,
                         onValueChange = {},
                         placeholder = AppString.COMPANY_NAME,
                         readOnly = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     CustomTextField(
@@ -57,7 +61,7 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                         onValueChange = {},
                         placeholder = AppString.COMPANY_WEBSITE,
                         readOnly = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     CustomTextField(
@@ -65,9 +69,10 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                         onValueChange = {},
                         placeholder = AppString.DESCRIPTION,
                         readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(150.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     CustomTextField(
@@ -75,38 +80,26 @@ fun CompanyDetailScreen(navController: NavController, viewModel: CompanyViewMode
                         onValueChange = {},
                         placeholder = AppString.APPLY_STATUS,
                         readOnly = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Button(
                         onClick = {
-                            viewModel.onEvent(CompanyViewEvent.DeleteCompany(comp.id))
-                            navController.navigate(Route.HomeScreen)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                            .padding(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                    ) {
-                        Text(AppString.DELETE_COMPANY, color = MaterialTheme.colorScheme.onErrorContainer)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
                             navController.navigate(Route.editCompanyScreen(comp.id))
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                            .padding(16.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .padding(16.dp),
                     ) {
                         Text(AppString.EDIT_COMPANY)
                     }
                 }
             } ?: Text(
                 AppString.COMPANY_NOT_FOUND,
-                modifier = Modifier
+                modifier =
+                    Modifier
                     .align(Alignment.Center)
             )
         }

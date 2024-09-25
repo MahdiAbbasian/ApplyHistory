@@ -15,7 +15,7 @@ interface CompanyDao {
         fun getAll(): LiveData<List<CompanyEntity>>
 
         @Query("SELECT * FROM CompanyEntity WHERE id = :id")
-        fun getCompany(id : Int): CompanyEntity?
+        fun getCompany(id: Int): CompanyEntity?
 
         @Query("SELECT COUNT(id) FROM CompanyEntity")
         fun getCompaniesCount(): LiveData<Int>
@@ -26,6 +26,6 @@ interface CompanyDao {
         @Query("UPDATE CompanyEntity SET description = :description, companyName= :companyName, companyWebSite= :companyWeb, lastUpdateDate= :lastUpdateDate, applyStatus= :applyStatus WHERE id =:id")
         suspend fun update(description: String?, companyName: String?,companyWeb: String?,lastUpdateDate: String?, applyStatus: Int?, id: Int)
 
-        @Query("DELETE FROM CompanyEntity WHERE id=(:id)")
-        fun deleteCompany(id:Int)
+        @Query("DELETE FROM CompanyEntity WHERE id = :id")
+        fun deleteCompany(id: Int)
 }

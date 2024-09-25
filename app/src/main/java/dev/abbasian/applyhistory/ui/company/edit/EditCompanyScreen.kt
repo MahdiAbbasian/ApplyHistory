@@ -173,7 +173,10 @@ fun EditCompanyScreen(
                                 )
                             )
                         }
-                        navController.navigate(Route.HomeScreen)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("refreshCompanies", true)
+                        navController.navigate(Route.HomeScreen) {
+                            popUpTo(Route.EditCompany()) { inclusive = true }
+                        }
                     }
                 },
                 modifier = Modifier
