@@ -26,3 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ApplyHistory"
 include(":app")
+include(":shared")

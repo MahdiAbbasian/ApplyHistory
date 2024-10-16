@@ -1,29 +1,43 @@
 [versions]
-kotlin = "1.9.22"
-androidGradlePlugin = "8.2.2"
-composeCompiler = "1.5.10"
+android.compileSdk = "34"
+android.minSdk = "26"
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.21"
+androidGradlePlugin = "8.4.2"
+dependencyUpdates = "0.51.0"
+composeCompiler = "1.6.8"
 androidx-core-ktx = "1.7.0"
 lifecycle-runtime-ktx = "2.7.0"
 lifecycle-livedata-core-ktx = "2.5.1"
 lifecycle-livedata-ktx = "2.5.1"
 lifecycle-extensions = "2.2.0"
-activity-compose = "1.8.2"
-compose-bom = "2023.08.00"
+activity-compose = "1.9.0"
+compose-bom = "2024.09.02"
 navigation-compose = "2.8.0-alpha08"
 appcompat = "1.6.1"
 room = "2.6.0"
-kotlinx-coroutines-android = "1.5.2"
+kotlinx-coroutines-android = "1.8.0"
 kotlinx-serialization-json = "1.6.3"
-koin = "3.1.2"
+koin = "3.5.3"
 gson = "2.8.9"
-accompanist-systemuicontroller = "0.28.0"
+multiplatform-settings = "1.1.1"
+sqldelightRuntime = "1.5.3"
+sqldelightCoroutines = "1.5.5"
+kotlinxDatetime = "0.4.0"
+mokoMvvm = "0.16.1"
+ktorCore = "2.3.7"
+kotlinxCoroutinesCore = "1.5.0-native-mt"
+ktorOkhttp = "2.0.0"
+desugar-jdk-libs = "2.0.4"
+napier = "2.7.1"
+voyager = "1.0.0"
+accompanist-systemuicontroller = "0.32.0"
 junit = "4.13.2"
 mockk = "1.12.2"
 robolectric = "4.7.3"
 junitExt = "1.1.5"
 composeUiTestJunit4 = "1.0.0"
 navigationTesting = "2.3.5"
-uiTestJunit4Android = "1.6.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -45,7 +59,25 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+sqldelight-runtime = { group = "com.squareup.sqldelight", name = "runtime", version.ref = "sqldelightRuntime" }
+sqldelight-coroutines-extensions = { group = "com.squareup.sqldelight", name = "coroutines-extensions", version.ref = "sqldelightCoroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+moko-mvvm-core = { group = "dev.icerock.moko", name = "mvvm-core", version.ref = "mokoMvvm" }
+moko-mvvm-compose = { group = "dev.icerock.moko", name = "mvvm-compose", version.ref = "mokoMvvm" }
+moko-mvvm-flow = { group = "dev.icerock.moko", name = "mvvm-flow", version.ref = "mokoMvvm" }
+moko-mvvm-flow-compose = { group = "dev.icerock.moko", name = "mvvm-flow-compose", version.ref = "mokoMvvm" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktorCore" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+sqldelight-android-driver = { group = "com.squareup.sqldelight", name = "android-driver", version.ref = "sqldelightRuntime" }
+sqldelight-native-driver = { group = "com.squareup.sqldelight", name = "native-driver", version.ref = "sqldelightRuntime" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorOkhttp" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktorOkhttp" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-jdk-libs" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
@@ -53,9 +85,13 @@ robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "
 junit-ext = { module = "androidx.test.ext:junit", version.ref = "junitExt" }
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "composeUiTestJunit4" }
 navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
-androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
